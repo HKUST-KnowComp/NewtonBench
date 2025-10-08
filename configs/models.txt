@@ -1,0 +1,11 @@
+gpt41mini
+gpt41
+o4mini
+gpt5mini
+gpt5
+gem25f
+gem25p
+qwq-32b
+qwen3-235b
+dsv3
+dsr1
