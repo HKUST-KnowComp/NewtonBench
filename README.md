@@ -267,4 +267,6 @@ If you use NewtonBench in your research, please cite our paper:
 
 Tianshi Zheng (tzhengad@connect.ust.hk)
 
-Kelvin Kiu-Wai Tam ()
+Kelvin Kiu-Wai Tam (kwtamai@connect.ust.hk)
+
+Newt Hue-Nam K. Nguyen (khnnguyen@connect.ust.hk)
