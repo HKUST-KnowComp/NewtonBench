@@ -8,40 +8,40 @@ from modules.common.prompts_base import (
 from modules.common.types import ExperimentSystem
 
 PARAM_DESCRIPTION = """- N0: initial number of atoms. It should be a positive real number.
-- lambda_decay: the decay constant for the substance. It should be a positive real number.
+- lambda_constant: It should be a positive real number.
 - t: time elapsed. It should be a positive real number."""
 
 # Radioactive decay-specific submission requirements
-FUNCTION_SIGNATURE = "def discovered_law(N0, lambda_decay, t):"
+FUNCTION_SIGNATURE = "def discovered_law(N0, lambda_constant, t):"
 RETURN_DESCRIPTION = "the mathematical formula for the ground truth decay law that governs isotope decay in this universe"
 EXAMPLE = """**Example 1:**
 <final_law>
-def discovered_law(N0, lambda_decay, t):
+def discovered_law(N0, lambda_constant, t):
    import math
-   return N0 * math.exp(-lambda_decay * t)
+   return N0 * math.exp(-lambda_constant * t)
 </final_law>
 
 **Example 2:**
 <final_law>
-def discovered_law(N0, lambda_decay, t):
-   return N0 * math.exp(-lambda_decay * t)
+def discovered_law(N0, lambda_constant, t):
+   return N0 * math.exp(-lambda_constant * t)
 </final_law>
 
 **Note:** 
 - N0 is the initial number of atoms
-- lambda_decay is the decay constant (λ)
+- lambda_constant (λ)
 - t is the time elapsed since the initial measurement"""
 
 # Vanilla Equation Prompt for radioactive decay
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a radioactive decay measurement device that can measure the current activity of radioactive samples. You have precise control over the following properties for each experiment you run:
 - Initial Activity (`N0`) - always positive
-- Decay Constant (`lambda_decay`) - always positive
+- Lambda Constant (`lambda_constant`) - always positive
 - Time (`t`) - always positive
 
 **Important Notes:**
 - Initial Activity `N0` is always positive and represents the starting activity of the sample
-- Decay Constant `lambda_decay` is always positive and represents the rate of decay
+- Lambda Constant `lambda_constant` is always positive
 - Time `t` is always positive and represents the time elapsed since initial measurement
 - The current activity represents the remaining activity of the radioactive sample
 - If your input results in overflowing the system, the system will return `NaN` (Not a Number)
@@ -66,8 +66,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-  {{"N0": ..., "lambda_decay": ..., "t": ...}},
-  {{"N0": ..., "lambda_decay": ..., "t": ...}}
+  {{"N0": ..., "lambda_constant": ..., "t": ...}},
+  {{"N0": ..., "lambda_constant": ..., "t": ...}}
 ]
 </run_experiment>
 
@@ -81,13 +81,13 @@ The system will return a list of the measured current activity.
 SIMPLE_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a radioactive sample placed in front of a radiation detector. The system can:
-1. Control initial radioactive atom population and decay constant
+1. Control initial radioactive atom population and lambda constant
 2. Track measured activity over time using the detector
 3. Output how much remaining atoms left; however, it can only output 70% of the remaining atoms (i.e. measured activity is 0.7 * N(t))
 
 **Control Parameters:**
 - `N0`: Initial number of radioactive atoms (always positive)
-- `lambda_decay`: Decay constant of the isotope (always positive)
+- `lambda_constant`: Lambda constant (always positive)
 - `t`: Time elapsed (always positive)
 - `num_points`: Number of time points to sample
 
@@ -108,8 +108,8 @@ You have access to a radioactive sample placed in front of a radiation detector.
 **Input/Output Format:**
 <run_experiment>
 [
-   {{"N0": ..., "lambda_decay": ..., "t": ..., "num_points": ...}},
-   {{"N0": ..., "lambda_decay": ..., "t": ..., "num_points": ...}}
+   {{"N0": ..., "lambda_constant": ..., "t": ..., "num_points": ...}},
+   {{"N0": ..., "lambda_constant": ..., "t": ..., "num_points": ...}}
 ]
 </run_experiment>
 
@@ -160,7 +160,7 @@ The following laws are guaranteed to hold in this universe:
 COMPLEX_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a specially prepared radioactive decay system containing two different radioactive isotopes (Isotope A and Isotope B) that coexist in the initial sample. The system can:
-1. Control initial populations and decay constants for both isotopes
+1. Control initial populations and lambda constants for both isotopes
 2. Track the ratio of isotope populations over time
 3. Measure the instantaneous ratio R(t) = Nₐ(t) / Nᵦ(t) using an advanced spectrometer
 4. Calculate ratio patterns from temporal data
@@ -168,8 +168,8 @@ You have access to a specially prepared radioactive decay system containing two 
 **Control Parameters:**
 - `N0a`: Initial number of nuclei for Isotope A (always positive)
 - `N0b`: Initial number of nuclei for Isotope B (always positive)
-- `lambda_a`: Decay constant for Isotope A (always positive)
-- `lambda_b`: Decay constant for Isotope B (always positive)
+- `lambda_a`: Lambda constant for Isotope A (always positive)
+- `lambda_b`: Lambda constant for Isotope B (always positive)
 - `t`: Time elapsed (always positive)
 - `num_points`: Number of time points to sample
 
@@ -216,7 +216,7 @@ The system will return a list of temporal ratio profile data objects (at most 20
 
 **Physics Background:**
 - The ratio R(t) = Nₐ(t) / Nᵦ(t) reveals the relative decay behavior
-- Different decay constants lead to different decay rates for each isotope
+- Different lambda constants lead to different rates for each isotope
 - Ratio patterns reveal the underlying two-isotope decay law governing the system
 
 **Strategy**: Analyze whether these parameters serve similar or different functions:
@@ -243,7 +243,7 @@ The following laws are guaranteed to hold in this universe:
 
 4. Ratio Profile Physics:
    - Ratios follow patterns based on relative decay behavior
-   - The temporal pattern depends on both decay constants and initial populations
+   - The temporal pattern depends on both lambda constants and initial populations
    - This pattern reveals the underlying two-isotope decay law"""
 
 # General disclaimer for this simulated universe
@@ -294,10 +294,10 @@ print("Estimated error:", error)
 **Function definition and testing:**
 ```
 <python>
-def test_hypothesis(N0, lambda_decay, t):
+def test_hypothesis(N0, lambda_constant, t):
     # Test your hypothesis: N(t) = N0 * e^(-lambda * t^2.5)
     import numpy as np
-    return N0 * np.exp(-lambda_decay * (t ** 2.5))
+    return N0 * np.exp(-lambda_constant * (t ** 2.5))
 
 # Test with different parameters
 test_N0 = [1000.0, 2000.0, 3000.0]
@@ -322,10 +322,10 @@ N0=3000.0, λ=0.3, t=3.0 → N(t)=3000.0
 
 **Your Code:**
 ```python
-def test_hypothesis(N0, lambda_decay, t):
+def test_hypothesis(N0, lambda_constant, t):
     # Test your hypothesis: N(t) = N0 * e^(-lambda * t^2.5)
     import numpy as np
-    return N0 * np.exp(-lambda_decay * (t ** 2.5))
+    return N0 * np.exp(-lambda_constant * (t ** 2.5))
 
 # Test with different parameters
 test_N0 = [1000.0, 2000.0, 3000.0]

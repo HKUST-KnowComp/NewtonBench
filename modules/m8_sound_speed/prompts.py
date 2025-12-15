@@ -18,13 +18,12 @@ EXAMPLE = """**Example:**
 <final_law>
 def discovered_law(gamma, T, M):
     import math
-    R = 1.143
-    return math.sqrt(gamma * R * T / M)
+    C = 1.143
+    return math.sqrt(gamma * C * T / M)
 </final_law>
 
 **Note**:
 - `gamma` is the adiabatic index of the gas.
-- `R` is the ideal gas constant (value may be different in the simulated universe).
 - `T` is the temperature in Kelvin.
 - `M` is the molar mass of the gas in kg/mol.
 - If possible, group and wrap all variables into a single expression when appropriate (e.g., instead of T * sqrt(M), prefer sqrt(T² * M) to express the same relationship in a more unified form)."""
@@ -32,9 +31,9 @@ def discovered_law(gamma, T, M):
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a device that can directly measure the speed of sound in various ideal gases under controlled conditions.
 **Control Parameters:**
-- `gamma`: The adiabatic index of the gas.
-- `T`: The temperature of the gas in Kelvin.
-- `M`: The molar mass of the gas in kg/mol.
+- `adiabatic_index`: The adiabatic index of the gas.
+- `temperature`: The temperature of the gas in Kelvin.
+- `molar_mass`: The molar mass of the gas in kg/mol.
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -50,8 +49,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-  {{"gamma": ..., "T": ..., "M": ...}},
-  {{"gamma": ..., "T": ..., "M": ...}}
+  {{"adiabatic_index": ..., "temperature": ..., "molar_mass": ...}},
+  {{"adiabatic_index": ..., "temperature": ..., "molar_mass": ...}}
 ]
 </run_experiment>
 
@@ -72,9 +71,9 @@ You are using an echo-based setup to determine the speed of sound. A sound pulse
 
 **Control Parameters:**
 - `adiabatic_index`: The adiabatic index (`gamma`) of the gas in the chamber.
-- `molar_mass`: The molar mass (`M`) of the gas in kg/mol.
-- `temperature`: The temperature (`T`) of the gas in Kelvin.
-- `distance`: The distance (`d`) to the wall in meters.
+- `molar_mass`: The molar mass (`M`) of the gas.
+- `temperature`: The temperature (`T`) of the gas.
+- `distance`: The distance (`d`) to the wall.
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -128,10 +127,10 @@ You are using a resonance tube to find the speed of sound. A speaker generating 
 
 **Control Parameters:**
 - `adiabatic_index`: The adiabatic index (`gamma`) of the gas in the tube.
-- `molar_mass`: The molar mass (`M`) of the gas in kg/mol.
-- `temperature`: The temperature (`T`) of the gas in Kelvin.
-- `driving_frequency`: The frequency (`f`) of the sound wave from the speaker in Hertz.
-- `tube_diameter`: The internal diameter of the resonance tube in meters.
+- `molar_mass`: The molar mass (`M`) of the gas.
+- `temperature`: The temperature (`T`) of the gas.
+- `driving_frequency`: The frequency (`f`) of the sound wave from the speaker.
+- `tube_diameter`: The internal diameter of the resonance tube.
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -224,9 +223,9 @@ print("Estimated error:", error)
 <python>
 def test_hypothesis(gamma, T, M):
     import math
-    R = 1.1413
+    C = 1.1413
     try:
-        return math.sqrt(gamma * R * T / M)
+        return math.sqrt(gamma * C * T / M)
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
@@ -248,9 +247,9 @@ print(test_hypothesis(1.4, 300, 0.02897))
 ```python
 def test_hypothesis(gamma, T, M):
     import math
-    R = 1.1413
+    C = 1.1413
     try:
-        return math.sqrt(gamma * R * T / M)
+        return math.sqrt(gamma * C * T / M)
     except (ValueError, ZeroDivisionError):
         return float('nan')
 

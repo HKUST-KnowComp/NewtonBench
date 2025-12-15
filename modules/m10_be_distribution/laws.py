@@ -4,7 +4,7 @@ import random
 import numpy as np
 
 # --- Environment Constants ---
-HIDDEN_CONSTANT_C = 1.0513e-14
+HIDDEN_CONSTANT = 1.0513e-14
 
 # --- Ground Truth Laws ---
 
@@ -13,7 +13,7 @@ def _ground_truth_law_easy_v0(omega: float, T: float) -> float:
     """Easy law: n = 1 / (exp(C * ω / T) + 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * omega / T) + 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * omega / T) + 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -25,7 +25,7 @@ def _ground_truth_law_medium_v0(omega: float, T: float) -> float:
     """Medium law: n = 1 / (exp(C * ω ^ 1.5 / T) + 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * (omega**1.5) / T) + 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * (omega**1.5) / T) + 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -37,7 +37,7 @@ def _ground_truth_law_hard_v0(omega: float, T: float) -> float:
     """Hard law: n = 1 / (exp(C * ω ^ 1.5 / T ^ 2) + 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * (omega**1.5) / (T**2)) + 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * (omega**1.5) / (T**2)) + 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -50,7 +50,7 @@ def _ground_truth_law_easy_v1(omega: float, T: float) -> float:
     """Easy law: n = 1 / (exp(C * ω ^ 0.5 / T) - 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * (omega**0.5) / T) - 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * (omega**0.5) / T) - 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -62,7 +62,7 @@ def _ground_truth_law_medium_v1(omega: float, T: float) -> float:
     """Medium law: n = 1 / (exp(C * ω ^ 0.5 * T) - 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * (omega**0.5) * T) - 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * (omega**0.5) * T) - 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -74,7 +74,7 @@ def _ground_truth_law_hard_v1(omega: float, T: float) -> float:
     """Hard law: n = 1 / (exp(C * (ω ^ 0.5 * T ^ 2.3)) - 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * (omega**0.5 * T**2.3)) - 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * (omega**0.5 * T**2.3)) - 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -87,7 +87,7 @@ def _ground_truth_law_easy_v2(omega: float, T: float) -> float:
     """Easy law: n = 1 / (exp(C * ω / T ^ 3) - 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * omega / (T ** 3)) - 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * omega / (T ** 3)) - 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -99,7 +99,7 @@ def _ground_truth_law_medium_v2(omega: float, T: float) -> float:
     """Medium law: n = 1 / (exp(C * ω ^ 1.5 / T ^ 3) - 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (np.exp(HIDDEN_CONSTANT_C * (omega**1.5) / (T ** 3)) - 1)
+            value = 1 / (np.exp(HIDDEN_CONSTANT * (omega**1.5) / (T ** 3)) - 1)
         if value > 0 and np.isfinite(value):
             return value
         else:
@@ -111,7 +111,7 @@ def _ground_truth_law_hard_v2(omega: float, T: float) -> float:
     """Hard law: n = 1 / (-ln(C * ω ^ 1.5 / T ^ 3) - 1)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = 1 / (-np.log(HIDDEN_CONSTANT_C * (omega**1.5) / (T ** 3)) - 1)
+            value = 1 / (-np.log(HIDDEN_CONSTANT * (omega**1.5) / (T ** 3)) - 1)
         if value > 0 and np.isfinite(value):
             return value
         else:

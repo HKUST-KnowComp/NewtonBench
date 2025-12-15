@@ -37,21 +37,16 @@ def _run_light_propagation_experiment(
     to find the refraction angle.
     Returns a single measurement object with the formatted refraction angle.
     """
-    # Calculate refractive indices from speeds
     n1 = SPEED_OF_LIGHT / speed_medium1
     n2 = SPEED_OF_LIGHT / speed_medium2
 
-    # Compute angle2 from the selected ground truth law using (n1, n2, angle1)
-    # Ensure incidence angle is wrapped to valid range
     theta1_deg = wrap_angle(incidence_angle)
     theta2_deg = float(ground_truth_law(n1, n2, theta1_deg))
     
-    # Guard against non-physical or invalid angles
     if not np.isfinite(theta2_deg):
         theta2_deg = None
 
     if theta2_deg is not None:
-        # Inject measurement noise
         noisy_theta2 = inject_noise(theta2_deg, noise_level, ABSOLUTE_ANGLE_PRECISION)
 
         return {
@@ -76,22 +71,16 @@ def _run_triple_layer_experiment(
     This function calculates the final refraction angle by applying the ground
     truth law (Snell's Law) sequentially at each interface.
     """
-    # Calculate refraction angle from medium 1 to medium 2
     theta2_deg = float(ground_truth_law(refractive_index_1, refractive_index_2, incidence_angle))
 
-    # Guard against non-physical or invalid intermediate angles
     if not np.isfinite(theta2_deg):
         return {'final_refraction_angle': "invalid"}
 
-    # Use the angle from medium 2 as the incidence angle for medium 3
-    # The angle of incidence for the second interface is the same as the angle of refraction from the first
     theta3_deg = float(ground_truth_law(refractive_index_2, refractive_index_3, theta2_deg))
 
-    # Guard against non-physical or invalid final angles
     if not np.isfinite(theta3_deg):
         return {'final_refraction_angle': "invalid"}
 
-    # Inject measurement noise into the final angle
     noisy_theta3 = inject_noise(theta3_deg, noise_level, ABSOLUTE_ANGLE_PRECISION)
 
     return {

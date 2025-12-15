@@ -23,81 +23,81 @@ def extract_formula_from_function(func: Callable):
     func_def = next((n for n in tree.body if isinstance(n, ast.FunctionDef)), None)
     if func_def is None:
         raise ValueError("No function definition found in source.")
-    # Find the return statement
-    return_node = next((n for n in ast.walk(func_def) if isinstance(n, ast.Return)), None)
-    if return_node is None:
+    # Find all return statements
+    return_nodes = [n for n in ast.walk(func_def) if isinstance(n, ast.Return)]
+    if not return_nodes:
         raise ValueError("No return statement found in function.")
-
-    def _resolve_wrapped_expression(expr: ast.AST) -> ast.AST:
-        """
-        Attempt to unwrap simple wrappers around the core mathematical expression so
-        the judge sees the actual formula instead of helper constructs.
-        - float(value)  -> value
-        - return of a variable -> resolve latest assignment to that variable prior to return
-        """
-        # Unwrap float(<expr>) calls
-        if isinstance(expr, ast.Call) and isinstance(expr.func, ast.Name) and expr.func.id == 'float' and len(expr.args) == 1:
-            return _resolve_wrapped_expression(expr.args[0])
-
-        # If returning a variable name, try to find its latest assignment before the return
-        if isinstance(expr, ast.Name):
-            var_name = expr.id
-            return_lineno = getattr(return_node, 'lineno', None)
-            # Search for last assignment to var_name before the return across all nested blocks
-            last_assigned_expr = None
-            last_assigned_lineno = -1
-            if return_lineno is not None:
-                for node in ast.walk(func_def):
-                    node_lineno = getattr(node, 'lineno', 0)
-                    if node_lineno and node_lineno < return_lineno:
-                        if isinstance(node, ast.Assign):
-                            # Only consider single-target assigns of a Name
-                            if (
-                                len(node.targets) == 1
-                                and isinstance(node.targets[0], ast.Name)
-                                and node.targets[0].id == var_name
-                                and node_lineno > last_assigned_lineno
-                            ):
-                                last_assigned_expr = node.value
-                                last_assigned_lineno = node_lineno
-                        elif isinstance(node, ast.AnnAssign):
-                            if (
-                                isinstance(node.target, ast.Name)
-                                and node.target.id == var_name
-                                and node.value is not None
-                                and node_lineno > last_assigned_lineno
-                            ):
-                                last_assigned_expr = node.value
-                                last_assigned_lineno = node_lineno
-            if last_assigned_expr is not None:
-                return _resolve_wrapped_expression(last_assigned_expr)
-            # Fallback to original name if no assignment found
-            return expr
-
-        # If expression is a conditional (a if cond else b), prefer the non-NaN branch heuristically
-        if isinstance(expr, ast.IfExp):
-            # Try both branches; prefer the one that isn't a NaN literal
-            def is_nan_literal(e: ast.AST) -> bool:
-                # Matches float('nan')
-                return (
-                    isinstance(e, ast.Call)
-                    and isinstance(e.func, ast.Name)
-                    and e.func.id == 'float'
-                    and len(e.args) == 1
-                    and isinstance(e.args[0], ast.Constant)
-                    and isinstance(e.args[0].value, str)
-                    and e.args[0].value.lower() == 'nan'
-                )
-            # Prefer body if it isn't NaN, else orelse
-            if not is_nan_literal(expr.body):
-                return _resolve_wrapped_expression(expr.body)
-            return _resolve_wrapped_expression(expr.orelse)
-
-        return expr
-
-    core_expr = _resolve_wrapped_expression(return_node.value)
+    # Resolve each and collect non-constant candidates
+    candidates = []
+    for rn in return_nodes:
+        resolved = _resolve_wrapped_expression(rn.value, func_def, getattr(rn, 'lineno', 0))
+        if not isinstance(resolved, ast.Constant):
+            candidates.append(resolved)
+    if not candidates:
+        raise ValueError("No non-constant return found.")
+    # Pick the first non-constant (assuming it's the main formula)
+    core_expr = candidates[0]
     formula_str = ast.unparse(core_expr)
     return formula_str
+
+def _resolve_wrapped_expression(expr: ast.AST, func_def: ast.FunctionDef, return_lineno: int) -> ast.AST:
+    """
+    Attempt to unwrap simple wrappers around the core mathematical expression so
+    the judge sees the actual formula instead of helper constructs.
+    - float(value) -> value
+    - return of a variable -> resolve latest assignment to that variable prior to return
+    """
+    # Unwrap float(<expr>) calls
+    if isinstance(expr, ast.Call) and isinstance(expr.func, ast.Name) and expr.func.id == 'float' and len(expr.args) == 1:
+        return _resolve_wrapped_expression(expr.args[0], func_def, return_lineno)
+    # If returning a variable name, try to find its latest assignment before the return
+    if isinstance(expr, ast.Name):
+        var_name = expr.id
+        last_assigned_expr = None
+        last_assigned_lineno = -1
+        for node in ast.walk(func_def):
+            node_lineno = getattr(node, 'lineno', 0)
+            if node_lineno and node_lineno < return_lineno:
+                if isinstance(node, ast.Assign):
+                    if (
+                        len(node.targets) == 1
+                        and isinstance(node.targets[0], ast.Name)
+                        and node.targets[0].id == var_name
+                        and node_lineno > last_assigned_lineno
+                    ):
+                        last_assigned_expr = node.value
+                        last_assigned_lineno = node_lineno
+                elif isinstance(node, ast.AnnAssign):
+                    if (
+                        isinstance(node.target, ast.Name)
+                        and node.target.id == var_name
+                        and node.value is not None
+                        and node_lineno > last_assigned_lineno
+                    ):
+                        last_assigned_expr = node.value
+                        last_assigned_lineno = node_lineno
+        if last_assigned_expr is not None:
+            return _resolve_wrapped_expression(last_assigned_expr, func_def, return_lineno)
+        # Fallback to original name if no assignment found
+        return expr
+    # If expression is a conditional (a if cond else b), prefer the non-NaN branch heuristically
+    if isinstance(expr, ast.IfExp):
+        def is_nan_literal(e: ast.AST) -> bool:
+            # Matches float('nan')
+            return (
+                isinstance(e, ast.Call)
+                and isinstance(e.func, ast.Name)
+                and e.func.id == 'float'
+                and len(e.args) == 1
+                and isinstance(e.args[0], ast.Constant)
+                and isinstance(e.args[0].value, str)
+                and e.args[0].value.lower() == 'nan'
+            )
+        # Prefer body if it isn't NaN, else orelse
+        if not is_nan_literal(expr.body):
+            return _resolve_wrapped_expression(expr.body, func_def, return_lineno)
+        return _resolve_wrapped_expression(expr.orelse, func_def, return_lineno)
+    return expr
 
 def calculate_rmsle(y_true, y_pred):
     """

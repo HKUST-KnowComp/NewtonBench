@@ -3,33 +3,33 @@ import random
 from typing import Dict, List, Tuple, Callable, Optional
 
 # --- Easy Difficulty Laws (v0 only) ---
-def _ground_truth_law_easy_v0(N0: float, lambda_decay: float, t: float) -> float:
-    """Easy radioactive decay law: N(t) = N₀ * e^(-λ * t^0.5)"""
+def _ground_truth_law_easy_v0(N0: float, lambda_constant: float, t: float) -> float:
+    """Easy radioactive decay law: N(t) = N₀ * e^(-λ * t^1.5)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 * np.exp(-lambda_decay * (t ** 0.5))
+            value = N0 * np.exp(-lambda_constant * (t ** 1.5))
         if not np.isfinite(value):
             return float('nan')
         return float(value)
     except FloatingPointError:
         return float('nan')
 
-def _ground_truth_law_easy_v1(N0: float, lambda_decay: float, t: float) -> float:
-    """Easy radioactive decay law: N(t) = N₀ * e^(-λ * t^np.exp(1))"""
+def _ground_truth_law_easy_v1(N0: float, lambda_constant: float, t: float) -> float:
+    """Easy radioactive decay law: N(t) = N₀ * e^(-λ^1.5 * t)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 * np.exp(-lambda_decay * (t ** np.exp(1)))
+            value = N0 * np.exp(-lambda_constant ** 1.5 * t)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
     except FloatingPointError:
         return float('nan')
 
-def _ground_truth_law_easy_v2(N0: float, lambda_decay: float, t: float) -> float:
-    """Easy radioactive decay law: N(t) = N₀ ** 1.5 * e^(-λ * t)"""
+def _ground_truth_law_easy_v2(N0: float, lambda_constant: float, t: float) -> float:
+    """Easy radioactive decay law: N(t) = N₀ * e^(-(λ * t)^0.5)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 ** 1.5 * np.exp(-lambda_decay * t)
+            value = N0 * np.exp(-(lambda_constant * t) ** 1.5)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -37,33 +37,33 @@ def _ground_truth_law_easy_v2(N0: float, lambda_decay: float, t: float) -> float
         return float('nan')
 
 # --- Medium Difficulty Laws (v0 only) ---
-def _ground_truth_law_medium_v0(N0: float, lambda_decay: float, t: float) -> float:
-    """Medium radioactive decay law: N(t) = N₀ * e^(-2λ) + t^0.5"""
+def _ground_truth_law_medium_v0(N0: float, lambda_constant: float, t: float) -> float:
+    """Medium radioactive decay law: N(t) = N₀^1.2 * e^(-λ * t^1.5)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 * np.exp(-2 * lambda_decay + (t ** 0.5))
+            value = N0 ** 1.2 * np.exp(-lambda_constant * (t ** 1.5))
         if not np.isfinite(value):
             return float('nan')
         return float(value)
     except FloatingPointError:
         return float('nan')
 
-def _ground_truth_law_medium_v1(N0: float, lambda_decay: float, t: float) -> float:
-    """Medium radioactive decay law: N(t) = N₀ * e^(-λ + t^0.5)"""
+def _ground_truth_law_medium_v1(N0: float, lambda_constant: float, t: float) -> float:
+    """Medium radioactive decay law: N(t) = N₀^1.4 * e^(-λ ** 1.5 * t)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 * np.exp(-lambda_decay + (t ** 0.5))
+            value = N0 ** 1.4 * np.exp(-lambda_constant ** 1.5 * t)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
     except FloatingPointError:
         return float('nan')
 
-def _ground_truth_law_medium_v2(N0: float, lambda_decay: float, t: float) -> float:
-    """Medium radioactive decay law: N(t) = N₀ ** 1.5 * e^(-λ + t^0.5)"""
+def _ground_truth_law_medium_v2(N0: float, lambda_constant: float, t: float) -> float:
+    """Medium radioactive decay law: N(t) = N₀^1.8 * e^(-(λ * t) ** 1.5)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 ** 1.5 * np.exp(-lambda_decay + (t ** 0.5))
+            value = N0 ** 1.8 * np.exp(-(lambda_constant * t) ** 1.5)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -71,33 +71,33 @@ def _ground_truth_law_medium_v2(N0: float, lambda_decay: float, t: float) -> flo
         return float('nan')
 
 # --- Hard Difficulty Laws (v0 only) ---
-def _ground_truth_law_hard_v0(N0: float, lambda_decay: float, t: float) -> float:
-    """Hard radioactive decay law: N(t) = N₀ * e^(-(2λ + 2) + t^0.5)"""
+def _ground_truth_law_hard_v0(N0: float, lambda_constant: float, t: float) -> float:
+    """Hard radioactive decay law: N(t) = N₀^1.2 * e^(-λ ** (np.exp(1)) * t^1.5)"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 * np.exp(-(2 * lambda_decay + 2) + (t ** 0.5))
+            value = N0 ** 1.2 * np.exp(-lambda_constant ** (np.exp(1)) * (t ** 1.5))
         if not np.isfinite(value):
             return float('nan')
         return float(value)
     except FloatingPointError:
         return float('nan')
 
-def _ground_truth_law_hard_v1(N0: float, lambda_decay: float, t: float) -> float:
-    """Hard radioactive decay law: N(t) = N₀ * e^(-λ + 3 + t^0.5)"""
+def _ground_truth_law_hard_v1(N0: float, lambda_constant: float, t: float) -> float:
+    """Hard radioactive decay law: N(t) = N₀^1.4 * e^(-λ ** 1.5 * t ** (np.exp(1)))"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = N0 * np.exp(-lambda_decay + 3 + (t ** 0.5))
+            value = N0 ** 1.4 * np.exp(-lambda_constant ** 1.5 * (t ** (np.exp(1))))
         if not np.isfinite(value):
             return float('nan')
         return float(value)
     except FloatingPointError:
         return float('nan')
 
-def _ground_truth_law_hard_v2(N0: float, lambda_decay: float, t: float) -> float:
-    """Hard radioactive decay law: N(t) = log(N₀ ** 1.5) * e^(-λ + t^0.5)"""
+def _ground_truth_law_hard_v2(N0: float, lambda_constant: float, t: float) -> float:
+    """Hard radioactive decay law: N(t) = N₀^1.8 * e^(-(λ * t) ** (np.exp(1) + 1.5))"""
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = np.log(N0 ** 1.5) * np.exp(-lambda_decay + (t ** 0.5))
+            value = N0 ** 1.8 * np.exp(-(lambda_constant * t) ** (np.exp(1) + 1.5))
         if not np.isfinite(value):
             return float('nan')
         return float(value)

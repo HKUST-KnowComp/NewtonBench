@@ -14,16 +14,6 @@ from typing import Dict, List, Tuple, Callable, Optional
 def _ground_truth_law_easy_v0(I_0: float, theta: float) -> float:
     """
     Easy Malus's Law: I = I_0 * (sin(theta) + cos(theta))^2
-    
-    This is the modified Malus's Law that describes how the intensity
-    of polarized light changes as it passes through a polarizer.
-    
-    Args:
-        I_0: Initial light intensity in W/m² (should be positive)
-        theta: Angle between polarization direction and polarizer axis in radians
-    
-    Returns:
-        Transmitted light intensity I in W/m² (returns 0.0 if I_0 is invalid)
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -37,9 +27,6 @@ def _ground_truth_law_easy_v0(I_0: float, theta: float) -> float:
 def _ground_truth_law_easy_v1(I_0: float, theta: float) -> float:
     """
     Easy Malus's Law: I = I_0 * (sin(theta) / cos(theta))^2
-    
-    This is the modified Malus's Law that describes how the intensity
-    of polarized light changes as it passes through a polarizer.
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -53,9 +40,6 @@ def _ground_truth_law_easy_v1(I_0: float, theta: float) -> float:
 def _ground_truth_law_easy_v2(I_0: float, theta: float) -> float:
     """
     Easy Malus's Law: I = I_0 * (cos(theta) / sin(theta))^2
-    
-    This is the modified Malus's Law that describes how the intensity
-    of polarized light changes as it passes through a polarizer.
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -69,16 +53,6 @@ def _ground_truth_law_easy_v2(I_0: float, theta: float) -> float:
 def _ground_truth_law_medium_v0(I_0: float, theta: float) -> float:
     """
     Medium Malus's Law: I = I_0 * (2 * sin(theta) + cos(theta))^2
-    
-    This is a modified version of Malus's Law with a cubic power
-    relationship, representing a more complex polarization system.
-    
-    Args:
-        I_0: Initial light intensity in W/m² (should be positive)
-        theta: Angle between polarization direction and polarizer axis in radians
-    
-    Returns:
-        Transmitted light intensity I in W/m² (returns 0.0 if I_0 is invalid)
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -92,9 +66,6 @@ def _ground_truth_law_medium_v0(I_0: float, theta: float) -> float:
 def _ground_truth_law_medium_v1(I_0: float, theta: float) -> float:
     """
     Medium Malus's Law: I = I_0 * sin(theta)^2 / cos(theta)^3
-    
-    This is a modified version of Malus's Law with a cubic power
-    relationship, representing a more complex polarization system.
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -108,9 +79,6 @@ def _ground_truth_law_medium_v1(I_0: float, theta: float) -> float:
 def _ground_truth_law_medium_v2(I_0: float, theta: float) -> float:
     """
     Medium Malus's Law: I = I_0 * (cos(theta) / sin(theta))^e
-    
-    This is a modified version of Malus's Law with a cubic power
-    relationship, representing a more complex polarization system.
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -124,16 +92,6 @@ def _ground_truth_law_medium_v2(I_0: float, theta: float) -> float:
 def _ground_truth_law_hard_v0(I_0: float, theta: float) -> float:
     """
     Hard Malus's Law: I = I_0 * (2 * sin(theta) + 1.5 * cos(theta))^2
-    
-    This is an exponential decay relationship that represents
-    a highly complex polarization system with quantum effects.
-    
-    Args:
-        I_0: Initial light intensity in W/m² (should be positive)
-        theta: Angle between polarization direction and polarizer axis in radians
-    
-    Returns:
-        Transmitted light intensity I in W/m² (returns 0.0 if I_0 is invalid)
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -147,9 +105,6 @@ def _ground_truth_law_hard_v0(I_0: float, theta: float) -> float:
 def _ground_truth_law_hard_v1(I_0: float, theta: float) -> float:
     """
     Hard Malus's Law: I = I_0 * (sin(theta)^2 / cos(theta)^3)^e
-    
-    This is an exponential decay relationship that represents
-    a highly complex polarization system with quantum effects.
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
@@ -163,9 +118,6 @@ def _ground_truth_law_hard_v1(I_0: float, theta: float) -> float:
 def _ground_truth_law_hard_v2(I_0: float, theta: float) -> float:
     """
     Hard Malus's Law: I = I_0 * (sin(theta)^2 / cos(theta))^e
-    
-    This is an exponential decay relationship that represents
-    a highly complex polarization system with quantum effects.
     """
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):

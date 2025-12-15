@@ -3,64 +3,64 @@ import random
 from typing import Dict, List, Tuple, Callable, Optional
 
 # --- Environment Constants ---
-HIDDEN_CONSTANT_C = 6.674e-5
+HIDDEN_CONSTANT = 6.674e-5
 
 # --- v0 laws ---
 def _ground_truth_law_easy_v0(mass1: float, mass2: float, distance: float) -> float:
     """Easy law: F = C * m1 * m2 / r^1.5"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * mass1 * mass2) / (distance ** 1.5)
+    return (HIDDEN_CONSTANT * mass1 * mass2) / (distance ** 1.5)
 
 def _ground_truth_law_medium_v0(mass1: float, mass2: float, distance: float) -> float:
     """Medium law: F = C * (m1 * m2)^2 / r^1.5"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * (mass1 * mass2) ** 2) / (distance ** 1.5)
+    return (HIDDEN_CONSTANT * (mass1 * mass2) ** 2) / (distance ** 1.5)
 
 def _ground_truth_law_hard_v0(mass1: float, mass2: float, distance: float) -> float:
     """Hard law: F = C * (m1 + m2)^2 / r^1.5"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * (mass1 + mass2) ** 2) / (distance ** 1.5)
+    return (HIDDEN_CONSTANT * (mass1 + mass2) ** 2) / (distance ** 1.5)
 
 # --- v1 laws ---
 def _ground_truth_law_easy_v1(mass1: float, mass2: float, distance: float) -> float:
     """Easy law: F = C * m1 / r^2"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * mass1) / (distance ** 2)
+    return (HIDDEN_CONSTANT * mass1) / (distance ** 2)
 
 def _ground_truth_law_medium_v1(mass1: float, mass2: float, distance: float) -> float:
     """Medium law: F = C * m1 / r^2.6"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * mass1) / (distance ** 2.6)
+    return (HIDDEN_CONSTANT * mass1) / (distance ** 2.6)
 
 def _ground_truth_law_hard_v1(mass1: float, mass2: float, distance: float) -> float:
     """Hard law: F = C * m1^1.3 / r^2.6"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * mass1 ** 1.3) / (distance ** 2.6)
+    return (HIDDEN_CONSTANT * mass1 ** 1.3) / (distance ** 2.6)
 
 # --- v2 laws ---
 def _ground_truth_law_easy_v2(mass1: float, mass2: float, distance: float) -> float:
     """Easy law: F = C * (m1^2 * m2^2) / r^2"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * (mass1 ** 2 * mass2 ** 2)) / (distance ** 2)
+    return (HIDDEN_CONSTANT * (mass1 ** 2 * mass2 ** 2)) / (distance ** 2)
 
 def _ground_truth_law_medium_v2(mass1: float, mass2: float, distance: float) -> float:
     """Medium law: F = C * (m1^2 * m2^2) * r^2"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * (mass1 ** 2 * mass2 ** 2)) * (distance ** 2)
+    return (HIDDEN_CONSTANT * (mass1 ** 2 * mass2 ** 2)) * (distance ** 2)
 
 def _ground_truth_law_hard_v2(mass1: float, mass2: float, distance: float) -> float:
     """Hard law: F = C * (m1^2 + m2^2) * r^2"""
     if distance <= 0 or mass1 <= 0 or mass2 <= 0:
         return 0.0
-    return (HIDDEN_CONSTANT_C * (mass1 ** 2 + mass2 ** 2)) * (distance ** 2)
+    return (HIDDEN_CONSTANT * (mass1 ** 2 + mass2 ** 2)) * (distance ** 2)
 
 # --- Law Registry ---
 

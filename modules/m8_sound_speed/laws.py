@@ -3,7 +3,7 @@ import math
 import random
 
 # --- Environment Constants ---
-HIDDEN_CONSTANT_R = 3.516e2
+HIDDEN_CONSTANT = 3.516e2
 
 # --- Ground Truth Laws ---
 
@@ -11,21 +11,21 @@ HIDDEN_CONSTANT_R = 3.516e2
 def _ground_truth_law_easy_v0(gamma: float, T: float, M: float) -> float:
     """Easy law: v = sqrt(gamma * R * T**2 / M)"""
     try:
-        return math.sqrt(gamma * HIDDEN_CONSTANT_R * T**2 / M)
+        return math.sqrt(gamma * HIDDEN_CONSTANT * T**2 / M)
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
 def _ground_truth_law_medium_v0(gamma: float, T: float, M: float) -> float:
     """Medium law: v = sqrt(gamma * R * T**2 / M**1.5)"""
     try:
-        return math.sqrt(gamma * HIDDEN_CONSTANT_R * T**2 / M**1.5)
+        return math.sqrt(gamma * HIDDEN_CONSTANT * T**2 / M**1.5)
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
 def _ground_truth_law_hard_v0(gamma: float, T: float, M: float) -> float:
     """Hard law: v = sqrt((e ^ gamma) * R * T**2 / M**1.5)"""
     try:
-        return math.sqrt((math.exp(gamma)) * HIDDEN_CONSTANT_R * T**2 / M**1.5)
+        return math.sqrt((math.exp(gamma)) * HIDDEN_CONSTANT * T**2 / M**1.5)
     except (ValueError, ZeroDivisionError):
         return float('nan')
     
@@ -33,21 +33,21 @@ def _ground_truth_law_hard_v0(gamma: float, T: float, M: float) -> float:
 def _ground_truth_law_easy_v1(gamma: float, T: float, M: float) -> float:
     """Easy law: v = gamma * R * T / M"""
     try:
-        return gamma * HIDDEN_CONSTANT_R * T / M
+        return gamma * HIDDEN_CONSTANT * T / M
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
 def _ground_truth_law_medium_v1(gamma: float, T: float, M: float) -> float:
-    """Medium law: v = gamma * T * (R / M) ^ 1/3"""
+    """Medium law: v = gamma * T * R / (M ** 1/3)"""
     try:
-        return gamma * T * (HIDDEN_CONSTANT_R / M) ** (1/3)
+        return gamma * T * HIDDEN_CONSTANT / (M ** (1/3))
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
 def _ground_truth_law_hard_v1(gamma: float, T: float, M: float) -> float:
-    """Hard law: v = ln(gamma) * T * (R / M) ^ 1/3"""
+    """Hard law: v = ln(gamma) * T * R / (M ** 1/3)"""
     try:
-        return math.log(gamma) * T * (HIDDEN_CONSTANT_R / M) ** (1/3)
+        return math.log(gamma) * T * HIDDEN_CONSTANT / (M ** (1/3))
     except (ValueError, ZeroDivisionError):
         return float('nan')
     
@@ -55,21 +55,21 @@ def _ground_truth_law_hard_v1(gamma: float, T: float, M: float) -> float:
 def _ground_truth_law_easy_v2(gamma: float, T: float, M: float) -> float:
     """Easy law: v = sqrt(R * T / M)"""
     try:
-        return math.sqrt(HIDDEN_CONSTANT_R * T / M)
+        return math.sqrt(HIDDEN_CONSTANT * T / M)
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
 def _ground_truth_law_medium_v2(gamma: float, T: float, M: float) -> float:
     """Medium law: v = sqrt(R * T * M ** 1.5)"""
     try:
-        return math.sqrt(HIDDEN_CONSTANT_R * T * M ** 1.5)
+        return math.sqrt(HIDDEN_CONSTANT * T * M ** 1.5)
     except (ValueError, ZeroDivisionError):
         return float('nan')
 
 def _ground_truth_law_hard_v2(gamma: float, T: float, M: float) -> float:
     """Hard law: v = (R * T * M ** 1.5) ^ -2.8"""
     try:
-        return (HIDDEN_CONSTANT_R * T * (M ** 1.5)) ** -2.8
+        return (HIDDEN_CONSTANT * T * (M ** 1.5)) ** -2.8
     except (ValueError, ZeroDivisionError):
         return float('nan')
 

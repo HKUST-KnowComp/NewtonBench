@@ -21,7 +21,7 @@ def validate_function_definition(code: str) -> Tuple[bool, str]:
         (is_valid, error_message)
     """
     # Check function name and signature
-    if not re.search(r'def\s+discovered_law\s*\(k,\s*x\):', code):
+    if not re.search(r'def\s+discovered_law\s*\(\s*x\s*\):', code):
         return False, "Invalid function signature"
     # Check if function has a return statement
     if not re.search(r'return\s+.+', code):
@@ -40,7 +40,7 @@ def calculate_exponential_energy_loss(x: float, x_scale: float = None) -> float:
     - Microstructural damage and crack propagation
     
     Args:
-        x: Displacement in meters
+        x: Displacement
         x_scale: Characteristic displacement scale for energy decay
     
     Returns:
@@ -57,7 +57,6 @@ def calculate_exponential_energy_loss(x: float, x_scale: float = None) -> float:
     return energy_retention
 
 def _run_difficult_hooke_velocity_experiment(
-    k: float,
     x: float,
     m: float,
     noise_level: float = 0.01,
@@ -67,10 +66,8 @@ def _run_difficult_hooke_velocity_experiment(
     Simulate a difficult Hooke's law experiment to calculate realistic maximum velocity.
     
     Args:
-        k (float): Spring constant in N/m
-        x (float): Displacement from equilibrium in meters
-        m (float): Mass in kg
-        x_scale (float): Displacement scale for friction calculation (uses default if None)
+        x (float): Displacement from equilibrium
+        m (float): Mass
         noise_level (float): Relative noise level for measurements
         energy_law (callable): Function to compute the energy law
     Returns:
@@ -79,23 +76,16 @@ def _run_difficult_hooke_velocity_experiment(
     if energy_law is None:
         raise ValueError("energy_law must be provided")
     
-    # Step 1: Calculate elastic potential energy using the ground truth law
-    U = energy_law(k, x)
+    U = energy_law(x)
     
-    # Step 2: Calculate theoretical maximum velocity using energy conservation
-    # U = 1/2 * m * v_max^2, so v_max = sqrt(2*U/m)
     v_max = np.sqrt(2 * U / m)
     
-    # Step 3: Calculate realistic maximum velocity (accounting for exponential energy loss)
-    # Use fixed default x_scale for consistent exponential energy loss behavior
     energy_retention = calculate_exponential_energy_loss(x, HOOKE_DEFAULTS['default_displacement_scale'])
     real_v_max = energy_retention * v_max
     
-    # Step 4: Return realistic maximum velocity
     return inject_noise(real_v_max, noise_level, ABSOLUTE_VELOCITY_PRECISION)
 
 def _run_simple_hooke_velocity_experiment(
-    k: float,
     x: float,
     m: float,
     noise_level: float = 0.01,
@@ -105,39 +95,29 @@ def _run_simple_hooke_velocity_experiment(
     Simulate a simple Hooke's law experiment to calculate net kinetic energy after air resistance.
     
     Args:
-        k (float): Spring constant in N/m
-        x (float): Displacement from equilibrium in meters
-        m (float): Mass in kg
+        x (float): Displacement from equilibrium
+        m (float): Mass
         noise_level (float): Relative noise level for measurements
         energy_law (callable): Function to compute the energy law
     Returns:
-        float: Net kinetic energy after air resistance in J
+        float: Net kinetic energy after air resistance
     """
     if energy_law is None:
         raise ValueError("energy_law must be provided")
 
-    # Air resistance coefficient
     k_air = 0.2
     
-    # Early validation for invalid inputs
     if m <= 0:
         return float('nan')
+
+    U = energy_law(x)
     
-    # Calculate elastic potential energy using the ground truth law
-    U = energy_law(k, x)
-    
-    # Calculate maximum velocity using energy conservation: U = 1/2 * m * v_max^2
-    # v_max = sqrt(2*U/m)
     v_max = np.sqrt(2 * U / m)
-    
-    # Calculate kinetic energy without air resistance
+
     KE = 0.5 * m * (v_max ** 2)
     
-    # Calculate kinetic energy loss due to air resistance
-    # KE_loss = -k_air * x * v_max^2
     KE_loss = -k_air * x * (v_max ** 2)
     
-    # Return net kinetic energy after air resistance
     return inject_noise(KE - KE_loss, noise_level, ABSOLUTE_ENERGY_PRECISION)
 
 def run_experiment_for_module(
@@ -151,11 +131,8 @@ def run_experiment_for_module(
     Enhanced experiment runner supporting vanilla_equation, simple_system, and complex_system modes for Hooke's law.
     
     Args:
-        k: Spring constant in N/m (can also be passed via kwargs) - for vanilla_equation/simple_system
-        x: Displacement from equilibrium in meters (can also be passed via kwargs) - for vanilla_equation/simple_system
-        t: Time elapsed in seconds (can also be passed via kwargs) - for vanilla_equation/simple_system
-        k1: Spring constant of first spring in N/m (can also be passed via kwargs) - for complex_system
-        k2: Spring constant of second spring in N/m (can also be passed via kwargs) - for complex_system
+        x: Displacement from equilibrium (can also be passed via kwargs) - for vanilla_equation/simple_system
+        t: Time elapsed (can also be passed via kwargs) - for vanilla_equation/simple_system
         noise_level: Relative noise level for measurements
         difficulty: Difficulty level ('easy', 'medium', 'hard')
         system: Experiment system ('vanilla_equation', 'simple_system', 'complex_system')
@@ -167,34 +144,31 @@ def run_experiment_for_module(
         For complex_system: net kinetic energy after air resistance (float)
     """
     # Handle flexible parameter passing - using module 8 approach
-    k = kwargs.get('k', 1.0)
     x = kwargs.get('x', 1.0)
     t = kwargs.get('t', 1.0)
     m = kwargs.get('m', HOOKE_DEFAULTS['default_mass'])
     x_scale = kwargs.get('x_scale', HOOKE_DEFAULTS['default_displacement_scale'])  # NEW
-    k1 = kwargs.get('k1', 1.0)
-    k2 = kwargs.get('k2', 1.0)
     
     # Get the ground truth law
     energy_law, _ = get_ground_truth_law(difficulty, law_version)
     
     if system == ExperimentSystem.VANILLA_EQUATION:
         # Vanilla equation
-        energy = energy_law(k, x)
+        energy = energy_law(x)
         return inject_noise(energy, noise_level, ABSOLUTE_ENERGY_PRECISION)
     
     elif system == ExperimentSystem.SIMPLE_SYSTEM:
         # Simple system: calculate net kinetic energy after air resistance
         m = kwargs.get('m', HOOKE_DEFAULTS['default_mass'])
         return _run_simple_hooke_velocity_experiment(
-            k, x, m, noise_level, energy_law
+            x, m, noise_level, energy_law
         )
     
     elif system == ExperimentSystem.COMPLEX_SYSTEM:
         # Complex system: calculate realistic maximum velocity
         m = kwargs.get('m', HOOKE_DEFAULTS['default_mass'])
         return _run_difficult_hooke_velocity_experiment(
-            k, x, m, noise_level, energy_law
+            x, m, noise_level, energy_law
         )
     
     else:
@@ -236,17 +210,14 @@ def evaluate_law(
     # Generate test data
     num_points = 5000
     # Use log-uniform sampling for all parameters
-    k_values = np.exp(np.random.uniform(np.log(1e-3), np.log(1e3), num_points))  # Log uniform 0.001 to 1000 N/m
     x_values = np.exp(np.random.uniform(np.log(1e-3), np.log(1e0), num_points))  # Log uniform 0.001 to 1 m
     
     test_data = {
-        'k': k_values,
         'x': x_values,
     }
     
     # Define parameter mapping for Hooke's law module
     parameter_mapping = {
-        "k": "k",
         "x": "x"
     }
     

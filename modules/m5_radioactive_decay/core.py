@@ -22,7 +22,7 @@ def validate_function_definition(code: str) -> Tuple[bool, str]:
         (is_valid, error_message)
     """
     # Check function name and signature
-    if not re.search(r'def\s+discovered_law\s*\(N0,\s*lambda_decay,\s*t\):', code):
+    if not re.search(r'def\s+discovered_law\s*\(N0,\s*lambda_constant,\s*t\):', code):
         return False, "Invalid function signature"
     # Check if function has a return statement
     if not re.search(r'return\s+.+', code):
@@ -41,53 +41,31 @@ def _run_difficult_radioactive_decay_experiment(
 ) -> Dict[str, List[str]]:
     """
     Simulate a complex radioactive decay experiment with two isotopes, tracking their ratio over time.
-    
-    Args:
-        N0a (float): Initial number of nuclei for Isotope A
-        N0b (float): Initial number of nuclei for Isotope B
-        lambda_a (float): Decay constant for Isotope A
-        lambda_b (float): Decay constant for Isotope B
-        t (float): Time elapsed
-        num_points (int): Number of time points to sample
-        noise_level (float): Relative noise level for measurements
-        decay_law (callable): Function to compute the decay law (ground truth law)
-    Returns:
-        dict: Temporal data with keys 'time', 'ratio' (all as lists of strings)
     """
     if decay_law is None:
         raise ValueError("decay_law must be provided")
     
-    # Generate time points (0 to t) using noisy time
     time_points = np.linspace(0, t, num_points)
     
-    # Calculate ratio profile over time: R(t) = Nₐ(t) / Nᵦ(t)
-    # Use the ground truth law to calculate Na(t) and Nb(t) separately
     ratios = []
     for time_point in time_points:
-        # Calculate Na(t) using the ground truth law for Isotope A
-        Na_t = decay_law(N0a, lambda_a, time_point)
-        # Calculate Nb(t) using the ground truth law for Isotope B  
+        Na_t = decay_law(N0a, lambda_a, time_point)  
         Nb_t = decay_law(N0b, lambda_b, time_point)
         
-        # Ensure we have scalar values (not arrays)
         Na_t = float(Na_t)
         Nb_t = float(Nb_t)
         
-        # Calculate ratio R(t) = Na(t) / Nb(t)
-        # Output NaN for problematic cases that the LLM should ignore
-        if abs(Nb_t) < 1e-10:  # If Nb_t is extremely small (division by zero risk)
-            ratio_t = np.nan  # Output NaN for LLM to ignore
+
+        if abs(Nb_t) < 1e-10:  
+            ratio_t = np.nan  
         else:
-            # Normal case: calculate ratio
             ratio_t = Na_t / Nb_t
-            # Check for overflow or invalid results
             if not np.isfinite(ratio_t):
-                ratio_t = np.nan  # Output NaN for any infinite or invalid results
+                ratio_t = np.nan 
         
         ratios.append(ratio_t)
     ratios = np.array(ratios)
     ratios = inject_noise(ratios, noise_level, ABSOLUTE_RATIO_PRECISION)
-    # Convert to string format
     time_list = ["{:.6e}".format(float(time_point)) for time_point in time_points]
     ratio_list = ["{:.6e}".format(float(r)) for r in ratios]
     
@@ -95,7 +73,7 @@ def _run_difficult_radioactive_decay_experiment(
 
 def _run_simple_radioactive_decay_experiment(
     N0: float,
-    lambda_decay: float,
+    lambda_constant: float,
     t: float,
     num_points: int = 20,
     noise_level: float = 0.01,
@@ -103,37 +81,21 @@ def _run_simple_radioactive_decay_experiment(
 ) -> Dict[str, List[str]]:
     """
     Simulate a radioactive decay experiment with a radiation detector, measuring activity over time.
-    
-    Args:
-        N0 (float): Initial number of radioactive atoms
-        lambda_decay (float): Decay constant of the isotope
-        t (float): Time elapsed
-        num_points (int): Number of time points to sample
-        noise_level (float): Relative noise level for measurements
-        decay_law (callable): Function to compute the decay law
-    Returns:
-        dict: Temporal data with keys 'time', 'measured_activity' (all as lists of strings)
     """
     if decay_law is None:
         raise ValueError("decay_law must be provided")
     
-    # Generate time points (0 to t) using noisy time
     time_points = np.linspace(0, t, num_points)
     
-    # Radiation detector measurement profile: Detector has 70% efficiency
     measured_activities = []
     for time_point in time_points:
-        # Calculate remaining atoms using the ground truth law
-        remaining_atoms = decay_law(N0, lambda_decay, time_point)
-        
-        # Ensure we have scalar values (not arrays)
+        remaining_atoms = decay_law(N0, lambda_constant, time_point)
+            
         remaining_atoms = float(remaining_atoms)
         
-        # Calculate measured activity: 70% of actual decays detected
         measured_activity = 0.7 * remaining_atoms
         measured_activities.append(measured_activity)
     
-    # Convert to string format
     measured_activities = np.array(measured_activities)
     measured_activities = inject_noise(measured_activities, noise_level, ABSOLUTE_ACTIVITY_PRECISION)
     time_list = ["{:.6e}".format(float(time_point)) for time_point in time_points]
@@ -152,14 +114,14 @@ def run_experiment_for_module(
     Enhanced experiment runner supporting vanilla_equation, simple_system, and complex_system modes for radioactive decay.
     Args:
         N0: Initial activity (can also be passed via kwargs) - for vanilla_equation
-        lambda_decay: Decay constant (can also be passed via kwargs) - for vanilla_equation
+        lambda_constant: lambda constant (can also be passed via kwargs) - for vanilla_equation
         t: Time elapsed (can also be passed via kwargs)
         N0: Initial number of parent isotope atoms (can also be passed via kwargs) - for simple_system
-        lambda_decay: Decay constant of parent isotope (can also be passed via kwargs) - for simple_system
+        lambda_constant: lambda constant of parent isotope (can also be passed via kwargs) - for simple_system
         N0a: Initial number of nuclei for Isotope A (can also be passed via kwargs) - for complex_system
         N0b: Initial number of nuclei for Isotope B (can also be passed via kwargs) - for complex_system
-        lambda_a: Decay constant for Isotope A (can also be passed via kwargs) - for complex_system
-        lambda_b: Decay constant for Isotope B (can also be passed via kwargs) - for complex_system
+        lambda_a: lambda constant for Isotope A (can also be passed via kwargs) - for complex_system
+        lambda_b: lambda constant for Isotope B (can also be passed via kwargs) - for complex_system
         noise_level: Relative noise level for measurements
         difficulty: Difficulty level ('easy', 'medium', 'hard')
         system: Experiment system ('vanilla_equation', 'simple_system', 'complex_system')
@@ -171,7 +133,7 @@ def run_experiment_for_module(
     """
     # Handle flexible parameter passing - using module 8 approach
     N0 = kwargs.get('N0', 1.0)
-    lambda_decay = kwargs.get('lambda_decay', 1.0)
+    lambda_constant = kwargs.get('lambda_constant', 1.0)
     t = kwargs.get('t', 1.0)
     N0a = kwargs.get('N0a', 1.0)
     N0b = kwargs.get('N0b', 1.0)
@@ -181,13 +143,13 @@ def run_experiment_for_module(
     decay_law, _ = get_ground_truth_law(difficulty, law_version)
 
     if system == ExperimentSystem.VANILLA_EQUATION:
-        true_activity = decay_law(N0, lambda_decay, t)
+        true_activity = decay_law(N0, lambda_constant, t)
         return inject_noise(true_activity, noise_level, ABSOLUTE_ACTIVITY_PRECISION)
 
     elif system == ExperimentSystem.SIMPLE_SYSTEM:
         return _run_simple_radioactive_decay_experiment(
             N0=N0,
-            lambda_decay=lambda_decay,
+            lambda_constant=lambda_constant,
             t=t,
             num_points=kwargs.get('num_points', 20),
             noise_level=noise_level,
@@ -242,20 +204,20 @@ def evaluate_law(
     # Generate test data
     num_points = 5000
     # Use log-uniform sampling for all parameters
-    N0_values = np.exp(np.random.uniform(np.log(1e-4), np.log(1e-2), num_points))  # Log uniform 10^-4 to 10^-2
-    lambda_decay_values = np.exp(np.random.uniform(np.log(1e-3), np.log(1e-1), num_points))  # Log uniform 10^-3 to 10^-1
+    N0_values = np.exp(np.random.uniform(np.log(1e0), np.log(1e2), num_points))  # Log uniform 1 to 100
+    lambda_constant_values = np.exp(np.random.uniform(np.log(1e-3), np.log(1e-1), num_points))  # Log uniform 10^-3 to 10^-1
     t_values = np.exp(np.random.uniform(np.log(1e-2), np.log(1e1), num_points))  # Log uniform 10^-2 to 10^1
     
     test_data = {
         'N0': N0_values,
-        'lambda_decay': lambda_decay_values,
+        'lambda_constant': lambda_constant_values,
         't': t_values,
     }
     
     # Define parameter mapping for radioactive decay module
     parameter_mapping = {
         "N0": "N0",
-        "lambda_decay": "lambda_decay", 
+        "lambda_constant": "lambda_constant", 
         "t": "t"
     }
     

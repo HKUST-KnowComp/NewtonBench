@@ -7,46 +7,44 @@ from modules.common.prompts_base import (
 )
 from modules.common.types import ExperimentSystem
 
-PARAM_DESCRIPTION = """- k: spring constant. It should be a positive real number.
-- x: displacement from the equilibrium position. It should be a positive real number."""
+PARAM_DESCRIPTION = """- x: displacement from the equilibrium position. It should be a positive real number."""
 
 # Hooke's law-specific submission requirements
-FUNCTION_SIGNATURE = "def discovered_law(k, x):"
+FUNCTION_SIGNATURE = "def discovered_law(x):"
 RETURN_DESCRIPTION = "the elastic potential energy stored in the spring based on the ground truth Hooke's law. Note: If the calculated energy would be negative, it will be clamped to 0."
 EXAMPLE = """**Example 1:**
 <final_law>
-def discovered_law(k, x):
+def discovered_law(x):
    import math
-   return 0.5 * k * (x ** 2)
+   c = 0.5
+   return cx
 </final_law>
 
 **Example 2:**
 <final_law>
-def discovered_law(k, x):
-   return 0.5 * k * (x ** 2)
+def discovered_law(x):
+   c = 0.8
+   return cx
 </final_law>
 
 **Note:** 
-- k is the spring constant in N/m
-- x is the displacement from equilibrium in meters
-- The function returns the elastic potential energy stored in Joules
+- x is the displacement from equilibrium
+- The function returns the elastic potential energy stored
 - If the calculated energy would be negative, it will be clamped to 0"""
 
 # Vanilla Equation Prompt for Hooke's law
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a Hooke's law measurement device that can measure the elastic potential energy stored in springs. You have precise control over the following properties for each experiment you run:
-- Spring Constant (`k`) - always positive
 - Displacement (`x`) - always positive
 
 **Important Notes:**
-- Spring constant `k` is always positive
 - Displacement `x` is always positive
 - The energy represents the amount of elastic potential energy stored in the spring
 - If the calculated energy would be negative, it will be clamped to 0
 
 **Strategy**: Analyze whether these parameters serve similar or different functions:
 - **Similar roles**: Parameters that both contribute to energy storage behavior in the same way
-- **Different roles**: Parameters that control fundamentally different aspects (e.g., one controls spring stiffness, another controls displacement)
+- **Different roles**: Parameters that control fundamentally different aspects (e.g., one controls displacement)
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -64,8 +62,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-  {{"k": ..., "x": ...}},
-  {{"k": ..., "x": ...}}
+  {{"x": ...}},
+  {{"x": ...}}
 ]
 </run_experiment>
 
@@ -81,22 +79,21 @@ The system will return a list of the measured energy.
 SIMPLE_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a Hooke's law system that can:
-1. Control spring constant, displacement, and mass parameters
+1. Control displacement and mass parameters
 2. Calculate net kinetic energy after air resistance
 3. Measure energy loss due to air resistance effects
 4. Track velocity and energy conservation relationships
 
 **Control Parameters:**
-- `k`: Spring constant in N/m (always positive)
-- `x`: Displacement from equilibrium in meters (always positive)
-- `m`: Mass in kg (always positive)
+- `x`: Displacement from equilibrium (always positive)
+- `m`: Mass (always positive)
 
 **Important Notes:**
 - This is a complex Hooke's law model with air resistance
 - The system calculates net kinetic energy after accounting for air resistance
-- Spring energy follows the ground truth law based on spring constant and displacement
+- Spring energy follows the ground truth law based displacement
 - If the calculated spring energy would be negative, it will be clamped to 0
-- Air resistance coefficient k_air = 0.2 is known and constant
+- k_air = 0.2 is known and constant
 - The output is net kinetic energy after accounting for air resistance effects
 
 {RUN_EXPERIMENT_INSTRUCTION}
@@ -110,30 +107,30 @@ You have access to a Hooke's law system that can:
 **Input/Output Format:**
 <run_experiment>
 [
-   {{"k": ..., "x": ..., "m": ...}},
-   {{"k": ..., "x": ..., "m": ...}}
+   {{"x": ..., "m": ...}},
+   {{"x": ..., "m": ...}}
 ]
 </run_experiment>
 
 **REMINDER: If you make a format error, re-read the initial prompt carefully to understand the correct format.**
 
 **System Response:**
-The system will return a list of net kinetic energy values in Joules for each experiment:
+The system will return a list of net kinetic energy values for each experiment:
 <experiment_output>
 [1.234e+00, 2.345e+00]
 </experiment_output>
 
 **Physics Background:**
-- Hooke's law energy follows the ground truth law: U = ground_truth_law(k, x)
-- Energy values depend on spring constant and displacement according to the ground truth law
+- Hooke's law energy follows the ground truth law: U = ground_truth_law(x)
+- Energy values depend on displacement according to the ground truth law
 - The system calculates maximum velocity and then accounts for air resistance effects
-- Air resistance coefficient k_air = 0.2 is known and affects the final energy output
+- k_air = 0.2 is known and affects the final energy output
 - The output represents net kinetic energy after air resistance losses
 
-**Strategy**: Analyze whether these parameters serve similar or different functions:
+- **Strategy**: Analyze whether these parameters serve similar or different functions:
 - **Similar roles**: Parameters that both contribute to energy storage behavior in the same way
-- **Different roles**: Parameters that control fundamentally different aspects (e.g., one controls spring stiffness, another controls displacement)
-- **Remember that your job is to discover the ground truth law for the net kinetic energy that takes k and x as inputs**
+- **Different roles**: Parameters that control fundamentally different aspects (e.g., one controls displacement)
+- **Remember that your job is to discover the ground truth law for the net kinetic energy that takes x as an input**
 
 **Confirmed Assisting Laws:**
 {ASSISTING_LAWS_DISCLAIMER}
@@ -144,22 +141,17 @@ The following laws are guaranteed to hold in this universe:
    - Total energy in the system remains constant
 
 2. Hooke's Law Energy: Spring energy follows the ground truth law
-   - U = ground_truth_law(k, x) where the exact form depends on the difficulty level
-   - Energy storage occurs at specific values based on spring constant and displacement
-   - The energy depends on the spring properties according to the ground truth law
+   - U = ground_truth_law(x) where the exact form depends on the difficulty level
+   - Energy storage occurs at specific values based on displacement
 
-3. Spring Constant: The spring constant determines energy storage capacity
-   - Larger spring constant means more energy storage potential
-   - The spring constant affects the energy relationship with displacement
-
-4. Air Resistance Physics:
-   - Air resistance coefficient k_air = 0.2 is known and constant
+3. Air Resistance Physics:
+   - k_air = 0.2 is known and constant
    - Air resistance affects the final kinetic energy output
    - The system accounts for energy losses due to air resistance
    - The output represents net kinetic energy after air resistance effects
 
-5. Energy Conservation with Air Resistance:
-   - Elastic potential energy: U = ground_truth_law(k, x)
+4. Energy Conservation with Air Resistance:
+   - Elastic potential energy: U = ground_truth_law(x)
    - Kinetic energy: U = 1/2 * m * v_max²
    - Air resistance energy loss: U_loss = -k_air * x * v_max²
    - Net kinetic energy: Net_KE = U - U_loss"""
@@ -168,18 +160,17 @@ The following laws are guaranteed to hold in this universe:
 COMPLEX_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a Hooke's law system that can:
-1. Control spring constant, displacement, and mass parameters
+1. Control displacement and mass parameters
 2. Calculate realistic maximum velocity from spring energy
 3. Account for energy losses in velocity calculations
 
 **Control Parameters:**
-- `k`: Spring constant in N/m (always positive)
-- `x`: Displacement from equilibrium in meters (always positive)
-- `m`: Mass in kg (always positive)
+- `x`: Displacement from equilibrium (always positive)
+- `m`: Mass (always positive)
 **Important Notes:**
 - This is a simplified Hooke's law model with exponential energy loss
 - The system calculates realistic maximum velocity from spring energy
-- Spring energy follows the ground truth law based on spring constant and displacement
+- Spring energy follows the ground truth law based on displacement
 - If the calculated spring energy would be negative, it will be clamped to 0
 - The velocity accounts for energy losses and realistic physics factors
 
@@ -194,8 +185,8 @@ You have access to a Hooke's law system that can:
 **Input/Output Format:**
 <run_experiment>
 [
-   {{"k": ..., "x": ..., "m": ...}},
-   {{"k": ..., "x": ..., "m": ...}}
+   {{"x": ..., "m": ...}},
+   {{"x": ..., "m": ...}}
 ]
 </run_experiment>
 
@@ -208,8 +199,8 @@ The system will return a list of realistic maximum velocity values in m/s for ea
 </experiment_output>
 
 **Physics Background:**
-- Hooke's law energy follows the ground truth law: U = ground_truth_law(k, x)
-- Energy values depend on spring constant and displacement according to the ground truth law
+- Hooke's law energy follows the ground truth law: U = ground_truth_law(x)
+- Energy values depend on displacement according to the ground truth law
 - The system calculates maximum velocity using energy conservation: U = 1/2 * m * v_max^2
 - **Exponential Energy Loss**: Energy retention follows exp(-x / x_scale) where x_scale is a fixed system parameter
 - Larger displacements experience exponential energy loss due to material fatigue and geometric effects
@@ -218,7 +209,7 @@ The system will return a list of realistic maximum velocity values in m/s for ea
 
 **Strategy**: Analyze whether these parameters serve similar or different functions:
 - **Similar roles**: Parameters that both contribute to energy storage behavior in the same way
-- **Different roles**: Parameters that control fundamentally different aspects (e.g., one controls spring stiffness, another controls displacement)
+- **Different roles**: Parameters that control fundamentally different aspects (e.g., one controls displacement)
 
 **Confirmed Assisting Laws:**
 {ASSISTING_LAWS_DISCLAIMER}
@@ -229,21 +220,16 @@ The following laws are guaranteed to hold in this universe:
    - Total energy in the system remains constant
 
 2. Hooke's Law Energy: Spring energy follows the ground truth law
-   - U = ground_truth_law(k, x) where the exact form depends on the difficulty level
-   - Energy storage occurs at specific values based on spring constant and displacement
-   - The energy depends on the spring properties according to the ground truth law
+   - U = ground_truth_law(x) where the exact form depends on the difficulty level
+   - Energy storage occurs at specific values based on displacement
 
-3. Spring Constant: The spring constant determines energy storage capacity
-   - Larger spring constant means more energy storage potential
-   - The spring constant affects the energy relationship with displacement and time
-
-4. Energy-Velocity Relationship:
+3. Energy-Velocity Relationship:
    - Energy conservation: U = 1/2 * m * v_max^2
    - Realistic velocity accounts for displacement-dependent friction
    - The output represents achievable maximum velocity in practice
-   - Your job is to discover the ground truth law for the U that takes k and x as inputs
+   - Your job is to discover the ground truth law for the U that takes x as an input
 
-5. Exponential Energy Loss:
+4. Exponential Energy Loss:
    - Energy retention follows exponential decay: energy_retention = exp(-x / x_scale)
    - The displacement scale x_scale is a fixed system parameter (not user-controlled)
    - Represents material fatigue, geometric nonlinearities, and stress accumulation"""
@@ -296,16 +282,16 @@ print("Estimated error:", error)
 **Function definition and testing:**
 ```
 <python>
-def test_hypothesis(k, x):
-    return 0.5 * k * (x ** 2)
+def test_hypothesis(x):
+    c = 0.5
+    return c*x
 
 # Test with different parameters
-test_k = [1.0, 2.0, 3.0]
 test_x = [0.5, 1.0, 1.5]
 
-for k_val, x_val in zip(test_k, test_x):
-    energy = test_hypothesis(k_val, x_val)
-    print(f"k={k_val}, x={x_val} → U={energy}")
+for x_val in test_x:
+    energy = test_hypothesis(x_val)
+    print(f"x={x_val} → U={energy}")
 </python>
 ```
 
@@ -331,22 +317,22 @@ print(a)
 ✅ **Python Code Execution Successful!**
 
 **Output:**
-k=1.0, x=0.5 → U=0.125
-k=2.0, x=1.0 → U=1.0
-k=3.0, x=1.5 → U=3.375
+x=0.5 → U=0.125
+x=1.0 → U=0.5
+x=1.5 → U=1.125
 
 **Your Code:**
 ```python
-def test_hypothesis(k, x):
-    return 0.5 * k * (x ** 2)
+def test_hypothesis(x):
+    c = 0.5
+    return c*x
 
 # Test with different parameters
-test_k = [1.0, 2.0, 3.0]
 test_x = [0.5, 1.0, 1.5]
 
-for k_val, x_val in zip(test_k, test_x):
-    energy = test_hypothesis(k_val, x_val)
-    print(f"k={k_val}, x={x_val} → U={energy}")
+for x_val in test_x:
+    energy = test_hypothesis(x_val)
+    print(f"x={x_val} → U={energy}")
 ```
 </python_output>
 ```

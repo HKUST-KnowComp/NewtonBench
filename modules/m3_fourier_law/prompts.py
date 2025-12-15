@@ -7,7 +7,7 @@ from modules.common.prompts_base import (
 )
 from modules.common.types import ExperimentSystem
 
-PARAM_DESCRIPTION = """- k: thermal conductivity coefficient of the material. It should be a positive real number.
+PARAM_DESCRIPTION = """- k: It should be a positive real number.
 - A: cross-sectional area. It should be a positive real number.
 - delta_T: temperature difference. It can be assumed to be a positive real number.
 - d: thickness of the material. It should be a positive real number."""
@@ -29,15 +29,15 @@ def discovered_law(k, A, delta_T, d):
 </final_law>
 
 **Note:** 
-- k is the thermal conductivity coefficient
-- A is the cross-sectional area
+- k is k_constant (always positive)
+- A is the cross-sectional area (always positive)
 - delta_T is the temperature difference (can be assumed to be > 0)
 - d is the distance/thickness (always positive)"""
 
 # Vanilla equation discovery prompt for Fourier law
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
-You have access to a thermal conductivity measurement device that can measure power transfer between two regions with different temperatures. You have precise control over the following properties for each experiment you run:
-- Thermal conductivity coefficient (`k`) - always positive
+You have access to a measurement device that can measure power transfer between two regions with different temperatures. You have precise control over the following properties for each experiment you run:
+- K_constant (`k`) - always positive
 - Cross-sectional area (`A`) - always positive
 - Temperature difference (`delta_T`) - can be assumed to be > 0
 - Distance/thickness (`d`) - always positive
@@ -83,12 +83,12 @@ The system will return a list of the measured power transfer rate
 SIMPLE_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a 1D thermal conduction system that can:
-1. Control thermal conductivity, area, temperature difference, and distance
+1. Control k_constant, area, temperature difference, and distance
 2. Track temperature profiles across spatial positions (0 to d)
 3. Measure temperature decay patterns along the conduction path
 
 **Control Parameters:**
-- `k`: Thermal conductivity coefficient (always positive)
+- `k`: k_constant (always positive)
 - `A`: Cross-sectional area (always positive)
 - `delta_T`: Temperature difference (can be assumed to be > 0)
 - `d`: Distance/thickness (always positive)
@@ -155,13 +155,13 @@ The following laws are guaranteed to hold in this universe:
 COMPLEX_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a 1D thermal conduction system that can:
-1. Control thermal conductivity, area, temperature difference, and distance
+1. Control k_constant, area, temperature difference, and distance
 2. Track temperature profiles across spatial positions (0 to d)
 3. Measure heat flux at different positions using Fourier's law
 4. Calculate heat flux from temperature gradients
 
 **Control Parameters:**
-- `k`: Thermal conductivity coefficient (always positive)
+- `k`: k_constant (always positive)
 - `A`: Cross-sectional area (always positive)
 - `delta_T`: Temperature difference (can be assumed to be > 0)
 - `d`: Distance/thickness (always positive)
@@ -223,12 +223,10 @@ The following laws are guaranteed to hold in this universe:
    - Temperature profiles evolve according to the heat equation
 
 3. Heat Flux Calculation: Finite difference approximation
-   - Heat flux is derived from spatial temperature variations
-   - The system measures how temperature changes across positions
-   - Heat flux patterns reveal the underlying heat transfer law
+   - Heat flux = -k * dT/dx
    
 4. Temperature Profile Physics:
-   - Temperatures decay exponentially"""
+   - The temperature profile follows the law: T(x) = T_diff * exp(-x * P / (k * A * T_diff))`, where `T_diff` is the temperature difference."""
 
 # Code assisted specific instructions for interactive Python code execution
 CODE_ASSISTED_PROMPT_INSTRUCTION = """**IMPORTANT: You have access to interactive Python code execution through <python> tags.**

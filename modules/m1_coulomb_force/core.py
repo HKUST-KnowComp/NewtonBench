@@ -44,24 +44,10 @@ def _run_linear_coulomb_experiment(
     """
     Simulate a 1D Coulomb experiment with F=ma dynamics, tracking velocity.
     q1 and q2 decay at different rates (q1: 10, q2: 5).
-    
-    Args:
-        q1 (float): Initial charge 1 (Coulombs)
-        m1 (float): Mass of q1 (kg)
-        q2 (float): Initial charge 2 (Coulombs)
-        m2 (float): Mass of q2 (kg)
-        distance (float): Initial distance between charges (meters)
-        duration (float): Total simulation time (seconds)
-        time_step (float): Time step (seconds)
-        noise_level (float): Relative noise level for measurements
-        force_law (callable): Function to compute the force law
-    Returns:
-        dict: Time series data with keys 'time', 'velocity' (all as lists of strings)
     """
     if force_law is None:
         raise ValueError("force_law must be provided")
 
-    # Decay rates
     decay_rate_q1 = 10.0
     decay_rate_q2 = 5.0
     
@@ -73,43 +59,30 @@ def _run_linear_coulomb_experiment(
     positions = np.zeros(num_steps)
     velocities = np.zeros(num_steps)
 
-    # Initial conditions
     positions[0] = distance
-    velocities[0] = 0.0  # Start from rest
+    velocities[0] = 0.0  
     
     for i, t in enumerate(times):
-        # Store current values
         positions[i] = positions[i-1] if i > 0 else distance
         velocities[i] = velocities[i-1] if i > 0 else 0.0
         
-        # Calculate charges at current time
         q1_t = q1 * np.exp(-t / decay_rate_q1)
         q2_t = q2 * np.exp(-t / decay_rate_q2)
         
-        # Calculate force using the provided force law
         current_distance = abs(positions[i])
-        F_magnitude = force_law(q1_t, q2_t, current_distance)
+        F_magnitude = force_law(abs(q1_t), abs(q2_t), current_distance)
         
-        # Force direction: positive force pushes q2 away from q1
-        # For repulsive forces (same sign charges), force is positive
-        # For attractive forces (opposite sign charges), force is negative
         F_direction = 1 if q1_t * q2_t > 0 else -1
         F_on_q2 = F_magnitude * F_direction
         
-        # Calculate acceleration: F = ma
         a = F_on_q2 / m2
         
-        # Update velocity: v = v + a * t
         if i > 0:
             velocities[i] = velocities[i-1] + a * time_step
-            
-            # Update position: x = x + v * t
             positions[i] = positions[i-1] + velocities[i] * time_step
 
-    # Add noise to measurements
     noisy_velocities = inject_noise(velocities, noise_level, ABSOLUTE_VELOCITY_PRECISION)
 
-    # Downsample to at most 20 data points
     max_points = 20
     if len(times) > max_points:
         times = times[:max_points]
@@ -134,24 +107,10 @@ def _run_linear_coulomb_experiment_with_kinetic_energy(
     """
     Simulate a 1D Coulomb experiment with F=ma dynamics and kinetic energy tracking.
     q1 and q2 decay at different rates (q1: 10, q2: 5).
-    
-    Args:
-        q1 (float): Initial charge 1 (Coulombs)
-        m1 (float): Mass of q1 (kg)
-        q2 (float): Initial charge 2 (Coulombs)
-        m2 (float): Mass of q2 (kg)
-        distance (float): Initial distance between charges (meters)
-        duration (float): Total simulation time (seconds)
-        time_step (float): Time step (seconds)
-        noise_level (float): Relative noise level for measurements
-        force_law (callable): Function to compute the force law
-    Returns:
-        dict: Time series data with keys 'time', 'kinetic_energy' (all as lists of strings)
     """
     if force_law is None:
         raise ValueError("force_law must be provided")
 
-    # Decay rates
     decay_rate_q1 = 10.0
     decay_rate_q2 = 5.0
     
@@ -164,46 +123,32 @@ def _run_linear_coulomb_experiment_with_kinetic_energy(
     velocities = np.zeros(num_steps)
     kinetic_energies = np.zeros(num_steps)
 
-    # Initial conditions
     positions[0] = distance
-    velocities[0] = 0.0  # Start from rest
+    velocities[0] = 0.0  
     
     for i, t in enumerate(times):
-        # Store current values
         positions[i] = positions[i-1] if i > 0 else distance
         velocities[i] = velocities[i-1] if i > 0 else 0.0
         
-        # Calculate charges at current time
         q1_t = q1 * np.exp(-t / decay_rate_q1)
         q2_t = q2 * np.exp(-t / decay_rate_q2)
         
-        # Calculate force using the provided force law
         current_distance = abs(positions[i])
-        F_magnitude = force_law(q1_t, q2_t, current_distance)
+        F_magnitude = force_law(abs(q1_t), abs(q2_t), current_distance)
         
-        # Force direction: positive force pushes q2 away from q1
-        # For repulsive forces (same sign charges), force is positive
-        # For attractive forces (opposite sign charges), force is negative
         F_direction = 1 if q1_t * q2_t > 0 else -1
         F_on_q2 = F_magnitude * F_direction
         
-        # Calculate acceleration: F = ma
         a = F_on_q2 / m2
         
-        # Update velocity: v = v + a * t
         if i > 0:
             velocities[i] = velocities[i-1] + a * time_step
-            
-            # Update position: x = x + v * t
             positions[i] = positions[i-1] + velocities[i] * time_step
         
-        # Calculate kinetic energy: KE = 1/2 * m * v^2
         kinetic_energies[i] = 0.5 * m2 * (velocities[i] ** 2)
 
-    # Add noise to measurements
     noisy_kinetic_energies = inject_noise(kinetic_energies, noise_level, ABSOLUTE_ENERGY_PRECISION)
 
-    # Downsample to at most 20 data points
     max_points = 20
     if len(times) > max_points:
         times = times[:max_points]

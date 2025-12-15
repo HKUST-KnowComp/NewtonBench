@@ -7,13 +7,13 @@ from modules.common.prompts_base import (
 	RUN_EXPERIMENT_INSTRUCTION_WITH_NOISE
 )
 
-PARAM_DESCRIPTION = """- q1: charge of the first object. It can be any real number.
-- q2: charge of the second object. It can be any real number.
+PARAM_DESCRIPTION = """- q1: magnitude of the charge of the first object. It should be a positive real number.
+- q2: magnitude of the charge of the second object. It should be a positive real number.
 - distance: distance between the two objects. It should be a positive real number."""
 
 # Electrostatics-specific submission requirements
 FUNCTION_SIGNATURE = "def discovered_law(q1, q2, distance):"
-RETURN_DESCRIPTION = "the signed magnitude of the electrostatic force between the two charges (positive means repulsive; negative means attractive)"
+RETURN_DESCRIPTION = "the magnitude of the electrostatic force between the two charges"
 EXAMPLE = """**Example 1:**
 <final_law>
 def discovered_law(q1, q2, distance):
@@ -30,19 +30,18 @@ def discovered_law(q1, q2, distance):
 </final_law>
 
 **Note:** 
-- q1 and q2 can be negative (electrons) or positive (protons)
+- q1 and q2 are always positive
 - distance is always positive, so no abs() needed"""
 
 # Vanilla equation discovery prompt for electrostatics
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a device that can position two point charges and measure the force acting between them. You have precise control over the following properties for each experiment you run:
-- Charge of the first object (`q1`) - can be positive or negative
-- Charge of the second object (`q2`) - can be positive or negative  
+- Charge of the first object (`q1`) - should be a positive real number
+- Charge of the second object (`q2`) - should be a positive real number  
 - Distance between the charges (`distance`) - always positive
 
 **Important Notes:**
-- Charges `q1` and `q2` can be negative (electrons) or positive (protons)
-- The sign of `q1` and `q2` are critical. Their product determines whether the force will be repulsive (positive) or attractive (negative). Therefore, do not use abs() on your final law.
+- Charges `q1` and `q2` are always positive
 - Distance `distance` is always positive and represents the magnitude of separation
 - No need to use abs() on distance since it's guaranteed to be positive
 
@@ -196,71 +195,6 @@ The following laws are guaranteed to hold in this universe:
 3. Kinetic Energy: KE = ½mv²
 """
 
-COULOMB_2D_DISCOVERY_PROMPT = """**Experimental Apparatus:**
-
-You have access to a 2D field simulation system that can:
-1. Position two charges (q1, q2) at any 2D coordinates
-2. Both charges decay exponentially over time with a fixed decay rate: q(t) = q(0) * exp(-t/decay_rate)
-3. Decay rate will not be disclosed to you
-4. Track the electric field vectors E1 and E2 at each charge position over time
-
-**Control Parameters:**
-- `q1`: Initial charge of the first particle (can be positive or negative)
-- `pos1`: The [x, y] position of the first particle
-- `q2`: Initial charge of the second particle (can be positive or negative)
-- `pos2`: The [x, y] position of the second particle
-- `duration`: Time to track the electric fields
-- `time_step`: Time interval between measurements
-
-**Important Notes:**
-- Charges `q1` and `q2` can be negative (electrons) or positive (protons)
-- The sign of `q1` and `q2` are critical. Their product determines whether the force will be repulsive (positive) or attractive (negative). Therefore, do not use abs() on your final law.
-- Distance calculations between charges will always be positive
-- No need to use abs() on distance since it's guaranteed to be positive
-
-{RUN_EXPERIMENT_INSTRUCTION}
-
-**Input/Output Format:**
-You must use the following JSON format for your requests and don't add any comments in side the JSON. The system will respond with a corresponding output array.
-
-*Your Request:*
-<run_experiment>
-[
-   {{"q1": ..., "pos1": [x1, y1], "q2": ..., "pos2": [x2, y2], "duration": ..., "time_step": ...}},
-   {{"q1": ..., "pos1": [x1, y1], "q2": ..., "pos2": [x2, y2], "duration": ..., "time_step": ...}}
-]
-</run_experiment>
-
-**System Response:**
-The system will return a list of time series data objects (at most 20 sets of data per experiment):
-<experiment_output>
-[
-   {{"time": [...], "E1_x": [...], "E1_y": [...], "E2_x": [...], "E2_y": [...]}} ,
-   {{"time": [...], "E1_x": [...], "E1_y": [...], "E2_x": [...], "E2_y": [...]}}
-]
-</experiment_output>
-
-**Physics Background:**
-- The simulation tracks electric field vectors in 2D space
-- E1_x, E1_y are the x and y components of the electric field at position 1
-- E2_x, E2_y are the x and y components of the electric field at position 2
-- The electric field is calculated as E = F/q where F is the force and q is the charge
-
-**Confirmed Assisting Laws:**
-{ASSISTING_LAWS_DISCLAIMER}
-
-The following laws are guaranteed to hold in this universe:
-1. Coulomb's Law: F = qE
-   - F is the force vector
-   - q is the charge
-   - E is the electric field vector
-
-2. Decay Law: q(t) = q(0) * exp(-t/50)
-   - q(0) is the initial charge
-   - t is the time
-
-3. Superposition Principle: The net electric field is the vector sum of fields from all charges"""
-
 # Code assisted specific instructions for interactive Python code execution
 CODE_ASSISTED_PROMPT_INSTRUCTION = """**IMPORTANT: You have access to interactive Python code execution through <python> tags.**
 
@@ -307,9 +241,8 @@ print("Estimated error:", error)
 ```
 <python>
 def test_hypothesis(q1, q2, distance):
-	# Test your hypothesis: F = K * q1 * q2 / r^3
-	K = 2.0
-	return (K * q1 * q2) / (distance ** 3)
+	C = 2.0
+	return (C * q1 * q2) / (distance ** 3)
 
 # Test with different parameters
 test_q1 = [1.0, -1.0, 2.0]
@@ -335,9 +268,8 @@ q1=2.0, q2=-1.0, d=3.0 → F=-0.0741
 **Your Code:**
 ```python
 def test_hypothesis(q1, q2, distance):
-	# Test your hypothesis: F = K * q1 * q2 / r^3
-	K = 2.0
-	return (K * q1 * q2) / (distance ** 3)
+	C = 2.0
+	return (C * q1 * q2) / (distance ** 3)
 
 # Test with different parameters
 test_q1 = [1.0, -1.0, 2.0]

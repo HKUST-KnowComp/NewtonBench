@@ -6,17 +6,6 @@ from typing import Dict, List, Tuple, Callable, Optional
 def _ground_truth_law_easy_v0(m: float, c: float, delta_T: float) -> float:
     """
     Easy heat transfer law: Q = m * c * (delta_T)^2.5
-    
-    Note: This law assumes delta_T > 0 (temperature increase only).
-    For cooling processes, use the absolute value of temperature change.
-    
-    Args:
-        m: Mass in kg (should be positive)
-        c: Specific heat capacity in J/(kg·K) (should be positive)
-        delta_T: Temperature change in K (should be positive, represents heating)
-    
-    Returns:
-        Heat transfer Q in Joules (returns 0.0 if any parameter is invalid)
     """
     # Check parameter validity and output 0 for invalid parameters
     if m <= 0 or c <= 0 or delta_T <= 0:
@@ -28,29 +17,24 @@ def _ground_truth_law_easy_v1(m: float, c: float, delta_T: float) -> float:
     """
     Easy heat transfer law: Q = m^2.5 * c * (delta_T)
     """
+    if m <= 0 or c <= 0 or delta_T <= 0:
+        return 0.0
+
     return m ** 2.5 * c * (delta_T)
 
 def _ground_truth_law_easy_v2(m: float, c: float, delta_T: float) -> float:
     """
-    Easy heat transfer law: Q = m * c^2.5 * (delta_T)
+    Easy heat transfer law: Q = (m * delta_T)^2.5 * c
     """
-    return m * c ** 2.5 * (delta_T)
+    if m <= 0 or c <= 0 or delta_T <= 0:
+        return 0.0
+
+    return (m * delta_T) ** 2.5 * c
 
 # --- Medium Difficulty Laws (v0 only) ---
 def _ground_truth_law_medium_v0(m: float, c: float, delta_T: float) -> float:
     """
-    Medium heat transfer law: Q = m * (delta_T)^2.5 * exp(-c)
-    
-    Note: This law assumes delta_T > 0 (temperature increase only).
-    For cooling processes, use the absolute value of temperature change.
-    
-    Args:
-        m: Mass in kg (should be positive)
-        c: Specific heat capacity in J/(kg·K) (should be positive)
-        delta_T: Temperature change in K (should be positive, represents heating)
-    
-    Returns:
-        Heat transfer Q in Joules (returns 0.0 if any parameter is invalid)
+    Medium heat transfer law: Q = c / (m * delta_T^2.5)
     """
     # Check parameter validity and output 0 for invalid parameters
     if m <= 0 or c <= 0 or delta_T <= 0:
@@ -58,7 +42,7 @@ def _ground_truth_law_medium_v0(m: float, c: float, delta_T: float) -> float:
     
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = m * (delta_T ** 2.5) * np.exp(-c)
+            value = c / (m * delta_T ** 2.5)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -67,11 +51,14 @@ def _ground_truth_law_medium_v0(m: float, c: float, delta_T: float) -> float:
 
 def _ground_truth_law_medium_v1(m: float, c: float, delta_T: float) -> float:
     """
-    Medium heat transfer law: Q = m^2.5 * c * exp(delta_T^2)
+    Medium heat transfer law: Q = c / (m^2.5 * delta_T)
     """
+    if m <= 0 or c <= 0 or delta_T <= 0:
+        return 0.0
+
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = m ** 2.5 * c * np.exp(delta_T ** 2)
+            value = c / (m ** 2.5 * delta_T)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -80,11 +67,14 @@ def _ground_truth_law_medium_v1(m: float, c: float, delta_T: float) -> float:
 
 def _ground_truth_law_medium_v2(m: float, c: float, delta_T: float) -> float:
     """
-    Medium heat transfer law: Q = c^2.5 * exp(-delta_T * m)
+    Medium heat transfer law: Q = c / (m^2.5 * delta_T^2.5)
     """
+    if m <= 0 or c <= 0 or delta_T <= 0:
+        return 0.0
+
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = c ** 2.5 * np.exp(-delta_T * m)
+            value = c / (m ** 2.5 * delta_T ** 2.5)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -94,18 +84,7 @@ def _ground_truth_law_medium_v2(m: float, c: float, delta_T: float) -> float:
 # --- Hard Difficulty Laws (v0 only) ---
 def _ground_truth_law_hard_v0(m: float, c: float, delta_T: float) -> float:
     """
-    Hard heat transfer law: Q = log(m * (delta_T ** 2.5)) * exp(-c)
-    
-    Note: This law assumes delta_T > 0 (temperature increase only).
-    For cooling processes, use the absolute value of temperature change.
-    
-    Args:
-        m: Mass in kg (should be positive)
-        c: Specific heat capacity in J/(kg·K) (should be positive)
-        delta_T: Temperature change in K (should be positive, represents heating)
-    
-    Returns:
-        Heat transfer Q in Joules (returns 0.0 if any parameter is invalid, otherwise can be positive or negative due to sine function)
+    Hard heat transfer law: Q = c / (m ** (np.exp(1) + 1) * (delta_T) ** 2.5)
     """
     # Check parameter validity and output 0 for invalid parameters
     if m <= 0 or c <= 0 or delta_T <= 0:
@@ -114,7 +93,7 @@ def _ground_truth_law_hard_v0(m: float, c: float, delta_T: float) -> float:
     # return np.sin(m * (delta_T ** 2.5)) * np.exp(-c)
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = np.log(m * (delta_T ** 2.5)) * np.exp(-c)
+            value = c / (m ** (np.exp(1) + 1) * (delta_T) ** 2.5)
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -123,12 +102,15 @@ def _ground_truth_law_hard_v0(m: float, c: float, delta_T: float) -> float:
 
 def _ground_truth_law_hard_v1(m: float, c: float, delta_T: float) -> float:
     """
-    Hard heat transfer law: Q = log(m^2.5 * c) * exp(-delta_T^2)
+    Hard heat transfer law: Q = c / (m ** 2.5 * delta_T ** (np.exp(1) + 1))
     """
+    if m <= 0 or c <= 0 or delta_T <= 0:
+        return 0.0
+
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
             # value = np.log(m * (delta_T ** 2.5)) * np.exp(delta_T ** 2)
-            value = np.log(m ** 2.5 * c) * np.exp(-delta_T ** 2)
+            value = c / (m ** 2.5 * delta_T ** (np.exp(1) + 1))
         if not np.isfinite(value):
             return float('nan')
         return float(value)
@@ -137,11 +119,14 @@ def _ground_truth_law_hard_v1(m: float, c: float, delta_T: float) -> float:
 
 def _ground_truth_law_hard_v2(m: float, c: float, delta_T: float) -> float:
     """
-    Hard heat transfer law: Q = log(c * m^2.5) * exp(-delta_T * m)
+    Hard heat transfer law: Q = c / (m * (delta_T)) ** (np.exp(1) + 1)
     """
+    if m <= 0 or c <= 0 or delta_T <= 0:
+        return 0.0
+
     try:
         with np.errstate(over='raise', divide='raise', invalid='raise', under='ignore'):
-            value = np.log(c ** 2.5) * np.exp(-delta_T + m)
+            value = c / (m * delta_T) ** (np.exp(1) + 1)
         if not np.isfinite(value):
             return float('nan')
         return float(value)

@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import random
 from typing import Dict, List, Tuple, Callable, Optional
@@ -6,62 +7,88 @@ from typing import Dict, List, Tuple, Callable, Optional
 
 def _ground_truth_law_easy_v0(k: float, A: float, delta_T: float, d: float) -> float:
     """Easy Fourier law: P = (k * A * delta_T) / d^2"""
-    if d <= 0 or delta_T <= 0:
-        return 0.0
-    return (k * A * delta_T) / (d ** 2)
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * A * delta_T) / (d ** 2)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 def _ground_truth_law_easy_v1(k: float, A: float, delta_T: float, d: float) -> float:
-    """Easy Fourier law: P = (k * A * delta_T) / d^3"""
-    if d <= 0 or delta_T <= 0:
-        return 0.0
-    return (k * A * delta_T) / (d ** 3)
+    """Easy Fourier law: P = (k * (A ** 0.5) * delta_T) / d"""
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * (A ** 0.5) * delta_T) / d
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 def _ground_truth_law_easy_v2(k: float, A: float, delta_T: float, d: float) -> float:
     """Easy Fourier law: P = (k * A * delta_T ** 2 / d)"""
-    if d <= 0 or delta_T <= 0:
-        return 0.0
-    return (k * A * delta_T ** 2) / d
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * A * delta_T ** 2) / d
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 # --- Medium Difficulty Laws ---
 
 def _ground_truth_law_medium_v0(k: float, A: float, delta_T: float, d: float) -> float:
-    """Medium Fourier law: P = (k * (A + delta_T)) / d^2"""
-    if d <= 0 or delta_T <= 0:
-        return 0.0
-    return (k * (A + delta_T)) / (d ** 2)
+    """Medium Fourier law: P = (k * (A ** 0.5) * delta_T) / d^2"""
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * (A ** 0.5) * delta_T) / (d ** 2)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 def _ground_truth_law_medium_v1(k: float, A: float, delta_T: float, d: float) -> float:
-    """Medium Fourier law: P = (k * (A + delta_T)) / d^3"""
-    if d <= 0 or delta_T <= 0:
-        return 0.0
-    return (k * (A + delta_T)) / (d ** 3)
+    """Medium Fourier law: P = (k * (A ** 0.5) * (delta_T ** 2.7)) / d"""
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * (A ** 0.5) * delta_T ** 2.7) / d
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 def _ground_truth_law_medium_v2(k: float, A: float, delta_T: float, d: float) -> float:
-    """Medium Fourier law: P = (k * (A + delta_T) ** 2 / d)"""
-    if d <= 0 or delta_T <= 0:
-        return 0.0
-    return (k * (A + delta_T) ** 2) / d
+    """Medium Fourier law: P = (k * delta_T ** 2) / (d * (A ** 3.4))"""
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * delta_T ** 2) / (d * (A ** 3.4))
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 # --- Hard Difficulty Laws ---
 
 def _ground_truth_law_hard_v0(k: float, A: float, delta_T: float, d: float) -> float:
-    """Hard Fourier law: P = (k * (A + delta_T) * A^2 * delta_T) / d^2"""
-    if delta_T <= 0 or d <= 0:
-        return 0.0
-    return (k * (A + delta_T) * A ** 2 * delta_T) / (d ** 2)
+    """Hard Fourier law: P = (k * (A ** 0.5) * (delta_T ** 1.3)) / d^2"""
+    try:
+        if delta_T <= 0 or d <= 0:
+            return 0.0
+        return (k * (A ** 0.5) * (delta_T**1.3)) / (d ** 2)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 def _ground_truth_law_hard_v1(k: float, A: float, delta_T: float, d: float) -> float:
-    """Hard Fourier law: P = (k * (A + delta_T) ** 2.5) / d^e"""
-    if delta_T <= 0 or d <= 0:
-        return 0.0
-    return (k * (A + delta_T) ** 2.5) / (d ** np.exp(1))
+    """Hard Fourier law: P = (k * (A ** 0.5) * (delta_T ** 2.7)) / d ** (3/7)"""
+    try:
+        if d <= 0 or delta_T <= 0:
+            return 0.0
+        return (k * (A ** 0.5) * delta_T ** 2.7) / d ** (3/7)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 def _ground_truth_law_hard_v2(k: float, A: float, delta_T: float, d: float) -> float:
-    """Hard Fourier law: P = (k * A + delta_T ** 2) / d"""
-    if delta_T <= 0 or d <= 0:
-        return 0.0
-    return (k * A + delta_T ** 2) / (d ** np.exp(1))
-
+    """Hard Fourier law: P = (k * delta_T ** 2) / (sqrt(d) * (A ** 3.4))"""
+    try:
+        if delta_T <= 0 or d <= 0:
+            return 0.0
+        return (k * delta_T ** 2) / (np.sqrt(d) * (A ** 3.4))
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 # --- Law Registry ---
 

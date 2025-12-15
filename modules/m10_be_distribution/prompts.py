@@ -8,7 +8,7 @@ from modules.common.prompts_base import (
 )
 
 PARAM_DESCRIPTION = """- omega: angular frequency. It should be a positive real number.
-- T: temperature in Kelvin. It should be a positive real number."""
+- T: temperature. It should be a positive real number."""
 
 # --- Core Law Discovery ---
 FUNCTION_SIGNATURE = "def discovered_law(omega, T):"
@@ -17,24 +17,24 @@ EXAMPLE = """**Example:**
 <final_law>
 def discovered_law(omega, T):
 	import math
-	Constant_H = 1.4314312-21 
-	return 1 / (math.exp(Constant_H * omega / T) - 1)
+	Constant = 1.4314312-21 
+	return 1 / (math.exp(Constant * omega / T) - 1)
 </final_law>
 
 **Note**:
-- `omega` is the angular frequency of the photons in rad/s.
-- `T` is the temperature in Kelvin."""
+- `omega` is the angular frequency of the photons.
+- `T` is the temperature."""
 
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a photons analyzer that can directly measure the average occupation number `n` of photons in quantum state for a system.
 
 **Control Parameters:**
-- `omega`: The angular frequency of the photons (in rad/s).
-    - the scale should be at least 1e8 rad/s
+- `omega`: The angular frequency of the photons.
+    - the scale should be at least 1e8
     - remember to test among different scales of `omega`
-- `T`: The temperature of the system (in Kelvin).
-    - the scale should be at least 1e1 K
-    - remember to test among different scales of `T`
+- `temperature`: The temperature of the system.
+    - the scale should be at least 1e1
+    - remember to test among different scales of `temperature`
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -50,8 +50,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-  {{"omega": ..., "T": ...}},
-  {{"omega": ..., "T": ...}}
+  {{"omega": ..., "temperature": ...}},
+  {{"omega": ..., "temperature": ...}}
 ]
 </run_experiment>
 
@@ -63,7 +63,7 @@ The system will return a list of measured average occupation numbers (n).
 
 **Strategy**: Analyze the functional roles of parameters in relation to the average occupation number of photons:
 - **Similar roles**: Identify parameters that influence the average occupation number of photons in comparable ways (e.g., both increasing or decreasing it proportionally).
-- **Different roles** Identify parameters that affect fundamentally different aspects of the system (e.g., one controls angle, another controls medium properties).
+- **Different roles** Identify parameters that affect fundamentally different aspects of the system.
 - The relationship you are trying to discover is highly non-linear (e.g. containing exponential function, trigonometric function, etc) and sensitive to the scale of your inputs. A robust experimental strategy is essential.
     - **Explore Orders of Magnitude:** Probing parameters at very different scales is critical. Small, incremental changes to your inputs will likely yield very similar, uninformative outputs. **Your goal is to map the function's behavior across its entire dynamic range.**
     - **The Law is Not a Simple Constant:** Be aware that the occupation number `n` is a strong function of both `omega` and `T`. If your experiments consistently return a constant value (e.g., always near zero or a very large number), it is a sign that your tests are confined to an asymptotic regime (a flat part of the curve). This means you must drastically change your parameters to find the interesting, transitional behavior.
@@ -79,11 +79,11 @@ You have access to a black-body cavity and a high-precision radiometer. You can 
 2.  **Tunable Radiometer**: An instrument that measures the power of radiation (spectral radiance) for a specific, user-defined frequency.
 
 **Control Parameters:**
-- `temperature`: The absolute temperature (`T`) of the cavity in Kelvin.
-    - the scale should be at least 1e1 K
+- `temperature`: The absolute temperature (`T`) of the cavity.
+    - the scale should be at least 1e1
     - remember to test among different scales of `T`
 - `probe_frequency`: The specific angular frequency (`ω`) at which to measure the radiation.
-    - the scale should be at least 1e8 rad/s
+    - the scale should be at least 1e8
     - remember to test among different scales of `probe_frequency`
 
 {RUN_EXPERIMENT_INSTRUCTION}
@@ -127,7 +127,7 @@ The following laws are guaranteed to hold in this universe:
 
 **Strategy**: Analyze the functional roles of parameters in relation to the average occupation number of photons:
 - **Similar roles**: Identify parameters that influence the average occupation number of photons in comparable ways (e.g., both increasing or decreasing it proportionally).
-- **Different roles** Identify parameters that affect fundamentally different aspects of the system (e.g., one controls angle, another controls medium properties).
+- **Different roles** Identify parameters that affect fundamentally different aspects of the system.
 - The relationship you are trying to discover is highly non-linear (e.g. containing exponential function, trigonometric function, etc) and sensitive to the scale of your inputs. A robust experimental strategy is essential.
     - **Explore Orders of Magnitude:** Probing parameters at very different scales is critical. Small, incremental changes to your inputs will likely yield very similar, uninformative outputs. **Your goal is to map the function's behavior across its entire dynamic range.**
     - **The Law is Not a Simple Constant:** Be aware that the occupation number `n` is a strong function of both `omega` and `T`. If your experiments consistently return a constant value (e.g., always near zero or a very large number), it is a sign that your tests are confined to an asymptotic regime (a flat part of the curve). This means you must drastically change your parameters to find the interesting, transitional behavior.
@@ -144,11 +144,11 @@ You are using a calorimeter to measure the radiation from a black-body cavity. A
 3.  **Calorimeter**: A device that absorbs all incoming radiation and measures the total power received.
 
 **Control Parameters:**
-- `temperature`: The absolute temperature (`T`) of the cavity in Kelvin.
-    - the scale should be at least 1e1 K
+- `temperature`: The absolute temperature (`T`) of the cavity.
+    - the scale should be at least 1e1
     - remember to test among different scales of `T`
 - `center_frequency`: The central angular frequency (`ω_c`) that the filter is tuned to.
-    - the scale should be at least 1e8 rad/s
+    - the scale should be at least 1e8
     - remember to test among different scales of `center_frequency`
 - `bandwidth`: The width of the frequency band (`Δω`) that the filter allows to pass.
 
@@ -194,7 +194,7 @@ The following are guaranteed to hold in this universe:
     
 **Strategy**: Analyze the functional roles of parameters in relation to the average occupation number of photons:
 - **Similar roles**: Identify parameters that influence the average occupation number of photons in comparable ways (e.g., both increasing or decreasing it proportionally).
-- **Different roles** Identify parameters that affect fundamentally different aspects of the system (e.g., one controls angle, another controls medium properties).
+- **Different roles** Identify parameters that affect fundamentally different aspects of the system.
 - The relationship you are trying to discover is highly non-linear (e.g. containing exponential function, trigonometric function, etc) and sensitive to the scale of your inputs. A robust experimental strategy is essential.
     - **Explore Orders of Magnitude:** Probing parameters at very different scales is critical. Small, incremental changes to your inputs will likely yield very similar, uninformative outputs. **Your goal is to map the function's behavior across its entire dynamic range.**
     - **The Law is Not a Simple Constant:** Be aware that the occupation number `n` is a strong function of both `omega` and `T`. If your experiments consistently return a constant value (e.g., always near zero or a very large number), it is a sign that your tests are confined to an asymptotic regime (a flat part of the curve). This means you must drastically change your parameters to find the interesting, transitional behavior.
@@ -249,10 +249,9 @@ print("Estimated error:", error)
 <python>
 def test_hypothesis(omega, T):
 	import math
-	Constant_H = 1.4314312-21 
+	Constant = 1.4314312-21 
 	try:
-		# Bose-Einstein distribution for bosons
-		return 1 / (math.exp(Constant_H * omega / T) - 1)
+		return 1 / (math.exp(Constant * omega / T) - 1)
 	except (ValueError, ZeroDivisionError):
 		return float('nan')
 
@@ -273,10 +272,9 @@ print(test_hypothesis(omega=2e14, T=5000))
 ```python
 def test_hypothesis(omega, T):
 	import math
-	Constant_H = 1.4314312-21 
+	Constant = 1.4314312-21 
 	try:
-		# Bose-Einstein distribution for bosons
-		return 1 / (math.exp(Constant_H * omega / T) - 1)
+		return 1 / (math.exp(Constant * omega / T) - 1)
 	except (ValueError, ZeroDivisionError):
 		return float('nan')
 

@@ -41,33 +41,17 @@ def _run_simple_fourier_experiment(
 ) -> Dict[str, List[str]]:
     """
     Simulate a 1D Fourier heat conduction experiment, tracking temperature profiles.
-    
-    Args:
-        k (float): Thermal conductivity coefficient
-        A (float): Cross-sectional area
-        delta_T (float): Temperature difference
-        d (float): Distance/thickness
-        num_points (int): Number of spatial points to sample
-        noise_level (float): Relative noise level for measurements
-        force_law (callable): Function to compute the power law
-    Returns:
-        dict: Spatial data with keys 'x', 'T' (all as lists of strings)
     """
     if force_law is None:
         raise ValueError("force_law must be provided")
     
-    # Compute power using the provided force law (ground truth law) with noisy inputs
     P = force_law(k, A, delta_T, d)
     
-    # Generate positions (0 to d) using noisy distance
     x = np.linspace(0, d, num_points)
-    # Temperature profile: Linear function of P
     temperatures = delta_T - (P / (k * A)) * x
     
-    # No need to add noise to temperatures since inputs already have noise
     noisy_temperatures = inject_noise(temperatures, noise_level, ABSOLUTE_TEMPERATURE_PRECISION)
     
-    # Convert to string format
     x_list = ["{:.6e}".format(float(pos)) for pos in x]
     temp_list = ["{:.6e}".format(float(temp)) for temp in noisy_temperatures.tolist()]
     
@@ -85,48 +69,20 @@ def _run_difficult_fourier_experiment(
 ) -> Dict[str, List[str]]:
     """
     Simulate a 1D Fourier heat conduction experiment, tracking temperature profiles and heat flux.
-    
-    Args:
-        k (float): Thermal conductivity coefficient
-        A (float): Cross-sectional area
-        delta_T (float): Temperature difference
-        d (float): Distance/thickness
-        num_points (int): Number of spatial points to sample
-        noise_level (float): Relative noise level for measurements
-        force_law (callable): Function to compute the power law
-        difficulty (str): Difficulty level ('easy', 'medium', 'hard') for temperature profile
-    Returns:
-        dict: Spatial data with keys 'x', 'heat_flux' (all as lists of strings)
     """
     if force_law is None:
         raise ValueError("force_law must be provided")
 
-    # Compute power using the provided force law (ground truth law) with noisy inputs
     P = force_law(k, A, delta_T, d)
     
-    # Generate positions (0 to d) using noisy distance
     x = np.linspace(0, d, num_points)
     
-    # Temperature profile: Different profiles based on difficulty level
-    if difficulty == 'easy':
-        # For Easy Ground Truth Law
-        temperatures = delta_T - np.exp(-x * P / (k * A * delta_T))
-    elif difficulty == 'medium':
-        # For Medium Ground Truth Law
-        temperatures = delta_T * np.exp(-x * P / (k * (A + delta_T)))
-    elif difficulty == 'hard':
-        # For Hard Ground Truth Law
-        temperatures = delta_T * np.exp(-x * P / (k * (A + delta_T) ** 2.5))
-    else:
-        # Fallback to simple case
-        temperatures = delta_T - np.exp(-x * P / (k * A * delta_T))
-    
-    # Calculate heat flux using Fourier's law: q = -k * dT/dx
-    q = -k * np.gradient(temperatures, x)  # Finite difference approximation
+    temperatures = delta_T * np.exp(-x * P / (k * A * delta_T))
+
+    q = -k * np.gradient(temperatures, x)  
     
     noisy_heat_flux = inject_noise(q, noise_level, ABSOLUTE_HEAT_FLUX_PRECISION)
 
-    # Convert to string format
     x_list = ["{:.6e}".format(float(pos)) for pos in x]
     flux_list = ["{:.6e}".format(float(flux)) for flux in noisy_heat_flux.tolist()]
     
@@ -145,7 +101,7 @@ def run_experiment_for_module(
     """
     Enhanced experiment runner supporting vanilla_equation, simple_system, and complex_system modes for Fourier's law.
     Args:
-        k: Thermal conductivity coefficient (can also be passed via kwargs)
+        k: k_constant (can also be passed via kwargs)
         A: Cross-sectional area (can also be passed via kwargs)
         delta_T: Temperature difference (can also be passed via kwargs)
         d: Distance/thickness (can also be passed via kwargs)

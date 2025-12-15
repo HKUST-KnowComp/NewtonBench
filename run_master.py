@@ -58,16 +58,19 @@ def build_commands(
     commands: List[List[str]] = []
     for model in models:
         for module in modules:
-            cmd = [
-                "python",
-                "run_all_evaluations.py",
-                "--module",
-                module,
-                "--model_name",
-                model,
-                "--no_prompt",
-            ]
-            commands.append(cmd)
+            for backend in ["vanilla_agent", "code_assisted_agent"]:
+                cmd = [
+                    "python",
+                    "run_all_evaluations.py",
+                    "--module",
+                    module,
+                    "--model_name",
+                    model,
+                    "--agent_backend",
+                    backend,
+                    "--no_prompt",
+                ]
+                commands.append(cmd)
     return commands
 
 
@@ -124,6 +127,7 @@ def spawn_mac_terminal_batches(repo_root: Path, batches: List[List[Sequence[str]
             continue
         # Build a single shell line: cd repo; cmd1 && cmd2 && ...; echo Done
         parts: List[str] = [f"cd {sh_quote(str(repo_root))}"]
+        parts.append("conda activate newtonbench")
         for cmd in batch:
             parts.append(" ".join(sh_quote(p) for p in cmd))
         parts.append("echo 'Batch completed';")
@@ -141,6 +145,7 @@ def spawn_windows_terminal_batches(repo_root: Path, batches: List[List[Sequence[
         if not batch:
             continue
         parts: List[str] = [f"cd /d {str(repo_root)}"]
+        parts.append("conda activate newtonbench")
         for cmd in batch:
             parts.append(" ".join(cmd))
         chained = " && ".join(parts)

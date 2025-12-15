@@ -78,9 +78,9 @@ def run_experiment_for_module(
     ground_truth_law, _ = get_ground_truth_law(difficulty, law_version)
 
     if system == ExperimentSystem.VANILLA_EQUATION:
-        gamma = kwargs.get('gamma', ECHO_METHOD_DEFAULTS['adiabatic_index'])
-        T = kwargs.get('T', ECHO_METHOD_DEFAULTS['temperature'])
-        M = kwargs.get('M', ECHO_METHOD_DEFAULTS['molar_mass'])
+        gamma = kwargs.get('adiabatic_index', ECHO_METHOD_DEFAULTS['adiabatic_index'])
+        T = kwargs.get('temperature', ECHO_METHOD_DEFAULTS['temperature'])
+        M = kwargs.get('molar_mass', ECHO_METHOD_DEFAULTS['molar_mass'])
         
         true_speed = ground_truth_law(gamma, T, M)
         return inject_noise(true_speed, noise_level, ABSOLUTE_VELOCITY_PRECISION)

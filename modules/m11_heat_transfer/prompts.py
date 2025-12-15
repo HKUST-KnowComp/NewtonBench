@@ -8,12 +8,12 @@ from modules.common.prompts_base import (
 from modules.common.types import ExperimentSystem
 
 PARAM_DESCRIPTION = """- m: mass of the substance. It should be a positive real number.
-- c: specific heat capacity of the substance. It should be a positive real number.
+- c: It should be a positive real number.
 - delta_T: temperature change. It should be a positive real number."""
 
 # Heat transfer-specific submission requirements
 FUNCTION_SIGNATURE = "def discovered_law(m, c, delta_T):"
-RETURN_DESCRIPTION = "the heat transfer in Joules based on the ground truth heat transfer law"
+RETURN_DESCRIPTION = "the heat transfer based on the ground truth heat transfer law"
 EXAMPLE = """**Example 1:**
 <final_law>
 def discovered_law(m, c, delta_T):
@@ -28,21 +28,21 @@ def discovered_law(m, c, delta_T):
 </final_law>
 
 **Note:** 
-- m is the mass in kg
-- c is the specific heat capacity in J/(kg·K)
-- delta_T is the temperature change in K
-- The function returns the heat transfer in Joules"""
+- m is the mass
+- c is the c_constant
+- delta_T is the temperature change
+- The function returns the heat transfer"""
 
 # Vanilla Equation Prompt for heat transfer
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a heat transfer measurement device that can measure the heat transfer between materials. You have precise control over the following properties for each experiment you run:
 - Mass (`m`) - always positive
-- Specific Heat Capacity (`c`) - always positive
+- C_constant (`c`) - always positive
 - Temperature Change (`delta_T`) - can be positive
 
 **Important Notes:**
 - Mass `m` is always positive
-- Specific heat capacity `c` is always positive
+- C_constant `c` is always positive
 - Temperature change `delta_T` must be positive (heating only)
 - The heat transfer represents the amount of energy transferred due to temperature change
 
@@ -87,15 +87,15 @@ The system will return the a list of measured heat transfernt.
 SIMPLE_SYSTEM_DISCOVERY_PROMPT = """**Experimental Apparatus:**
 
 You have access to a heat transfer system that can:
-1. Control mass, specific heat capacity, temperature change, and time parameters
+1. Control mass, c_constant, temperature change, and time parameters
 2. Track heat transfer profiles over time
 3. Measure heat transfer patterns
 
 **Control Parameters:**
-- `m`: Mass in kg (always positive)
-- `c`: Specific heat capacity in J/(kg·K) (always positive)
-- `delta_T`: Temperature change in K (MUST be positive, heating only)
-- `t`: Time elapsed in seconds (always positive)
+- `m`: Mass (always positive)
+- `c`: c_constant (always positive)
+- `delta_T`: Temperature change (MUST be positive, heating only)
+- `t`: Time elapsed (always positive)
 - `num_points`: Number of time points to sample
 
 **CRITICAL: Temperature Change Constraint**
@@ -107,7 +107,7 @@ You have access to a heat transfer system that can:
 **Important Notes:**
 - This is a simplified heat transfer model with power distribution among mechanisms
 - The system calculates total heat transfer, converts it to power, applies energy loss, and distributes remaining power
-- Heat transfer follows the ground truth law based on mass, specific heat capacity, and temperature change
+- Heat transfer follows the ground truth law based on mass, c_constant, and temperature change
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -149,7 +149,6 @@ The system will return a list of power distribution data objects:
 - Temperature change represents the increase in temperature during heating
 - **IMPORTANT**: For cooling processes, use the absolute value of temperature decrease
 - **WARNING**: Negative delta_T values will cause experiment failure
-- Mass, specific heat capacity, and temperature change affect the heat transfer according to the ground truth law
 
 **Strategy**: Analyze whether these parameters serve similar or different functions:
 - **Similar roles**: Parameters that both contribute to heat transfer behavior in the same way
@@ -165,21 +164,17 @@ The following laws are guaranteed to hold in this universe:
 
 2. Heat Transfer Law: Heat transfer follows the ground truth law
    - Q_total = ground_truth_law(m, c, delta_T) where Q_total is the total heat transfer
-   - Heat transfer occurs at specific values based on mass, specific heat capacity, and temperature change
+   - Heat transfer occurs at specific values based on mass, c_constant, and temperature change
    - The total heat transfer is converted to power using characteristic time
    - Temperature change must be positive (heating processes only)
 
-3. Specific Heat Capacity: The specific heat capacity determines heat storage capacity
-   - Larger specific heat capacity means more heat storage potential
-   - The specific heat capacity affects the heat transfer relationship with mass and temperature change
-
-4. Power Distribution Physics:
-   - Total heat transfer follows the ground truth law based on mass, specific heat capacity, and temperature change
+3. Power Distribution Physics:
+   - Total heat transfer follows the ground truth law based on mass, c_constant, and temperature change
    - The total heat transfer is converted to power using characteristic time: t = (m * c) / 100
    - **Energy Loss**: 18-22% of power is lost before distribution due to material imperfections
    - Your job is to discover the ground truth law for the total heat transfer Q_total
 
-5. Temperature Constraint:
+4. Temperature Constraint:
    - **delta_T MUST be positive (delta_T > 0)**
    - **Heating processes only** - the system cannot handle negative temperature changes
    - **For cooling processes**: Use the absolute value of temperature decrease
@@ -196,9 +191,9 @@ You have access to a heat transfer system that can:
 4. Power light bulbs based on available power from heat transfer
 
 **Control Parameters:**
-- `m`: Mass in kg (always positive)
-- `c`: Specific heat capacity in J/(kg·K) (always positive)
-- `delta_T`: Temperature change in K (MUST be positive, heating only)
+- `m`: Mass (always positive)
+- `c`: c_constant (always positive)
+- `delta_T`: Temperature change (MUST be positive, heating only)
 
 **CRITICAL: Temperature Change Constraints**
 - `delta_T` MUST be positive (greater than 0)
@@ -272,17 +267,13 @@ The following laws are guaranteed to hold in this universe:
    - Q_difference = |Q_original - Q_alternative|
    - Power = Q_difference / t where t = (m * c) / 100
 
-3. Specific Heat Capacity: The specific heat capacity determines heat storage capacity
-   - Larger specific heat capacity means more heat storage potential
-   - The specific heat capacity affects the heat transfer relationship with mass and temperature change
-
-4. Recovery Path: How to discover the ground truth law
+3. Recovery Path: How to discover the ground truth law
    - Use function mode to get direct Q_total measurements
    - Compare with light bulb counts to understand the difference mechanism
    - Analyze how light bulb count varies with m, c, delta_T
    - The ground truth law can be recovered by understanding the relationship between Q_original and Q_alternative
 
-5. Energy Loss and Power Generation:
+4. Energy Loss and Power Generation:
    - Energy loss (18-22%) is applied before power calculation
    - Power generation depends on heat transfer differences, not absolute values
    - Light bulb count provides indirect measurement of heat transfer relationships"""

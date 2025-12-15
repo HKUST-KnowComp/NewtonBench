@@ -7,9 +7,9 @@ from modules.common.prompts_base import (
     RUN_EXPERIMENT_INSTRUCTION_WITH_NOISE
 )
 
-PARAM_DESCRIPTION = """- k: spring constant. It should be a positive real number.
+PARAM_DESCRIPTION = """- k: It should be a positive real number.
 - m: mass of the object. It should be a positive real number.
-- b: damping coefficient. It should be a positive real number."""
+- b: It should be a positive real number."""
 
 # --- Core Law Discovery ---
 FUNCTION_SIGNATURE = "def discovered_law(k, m, b):"
@@ -22,16 +22,14 @@ def discovered_law(k, m, b):
 </final_law>
 
 **Note**:
-- k is the spring constant
-- m is the mass
-- b is the damping coefficient"""
+- m is the mass"""
 
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a system to measure the angular velocity of a damped harmonic oscillator. You have precise control over the following properties for each experiment you run:
 **Control Parameters:**
-- `k`: Spring constant.
-- `m`: Mass of the object.
-- `b`: Damping coefficient.
+- `k_constant`: k
+- `mass`: m
+- `b_constant`: b
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -47,8 +45,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-    {{"k": ..., "m": ..., "b": ...}},
-    {{"k": ..., "m": ..., "b": ...}}
+    {{"k_constant": ..., "mass": ..., "b_constant": ...}},
+    {{"k_constant": ..., "mass": ..., "b_constant": ...}}
 ]
 </run_experiment>
 
@@ -63,14 +61,14 @@ SIMPLE_SYSTEM_PROMPT = """**Experimental Apparatus:**
 You have a damped oscillator setup. You can control the physical properties of the system and measure the resulting period of oscillation.
 
 **Experimental Setup:**
-1. **Spring-Mass System**: A mass `m` is attached to a spring with constant `k`.
-2. **Damping Medium**: The system is placed in a fluid that provides a damping force proportional to the velocity, with a damping coefficient `b`.
+1. **Spring-Mass System**: A mass `m` is attached to a spring.
+2. **Damping Medium**: The system is placed in a fluid that provides a damping force proportional to the velocity.
 3. **Measurement**: The apparatus measures the time it takes for the system to complete one full oscillation (the period `T`).
 
 **Control Parameters:**
-- `spring_constant`: The spring constant (k).
-- `mass`: The mass of the object (m).
-- `damping_coefficient`: The damping coefficient (b).
+- `k_constant`: k
+- `mass`: m
+- `b_constant`: b
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -86,8 +84,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-  {{"spring_constant": ..., "mass": ..., "damping_coefficient": ...}},
-  {{"spring_constant": ..., "mass": ..., "damping_coefficient": ...}}
+  {{"k_constant": ..., "mass": ..., "b_constant": ...}},
+  {{"k_constant": ..., "mass": ..., "b_constant": ...}}
 ]
 </run_experiment>
 
@@ -115,19 +113,19 @@ You are working with a damped harmonic oscillator system. The setup consists of 
 
 **Experimental Setup:**
 1. **Spring-Mass System:**
-    - A mass m is attached to a spring with spring constant k, forming a classic harmonic oscillator.
+    - A mass m is attached to a spring, forming a classic harmonic oscillator.
 2. **Damping Medium:**
-    - The system is immersed in a fluid that exerts a damping force proportional to the velocity of the mass. This damping is characterized by the coefficient b.
+    - The system is immersed in a fluid that exerts a damping force proportional to the velocity of the mass.
 3. **Initial Conditions:**
     - The system is displaced with an initial amplitude A₀ and then released to oscillate freely.
 4. **Measurement:**
     - The apparatus records the amplitude of oscillation over time. Data is collected over two periods, with a maximum of 20 time-amplitude points per experiment.
 
 **Control Parameters:**
-- `spring_constant`: The spring constant (k).
-- `mass`: The mass of the object (m).
-- `damping_coefficient`: The damping coefficient (b).
-- `initial_amplitude`: The initial amplitude (A0).
+- `k_constant`: k
+- `mass`: m
+- `b_constant`: b
+- `initial_amplitude`: A0
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -143,8 +141,8 @@ You must use the following JSON format for your requests and don't add any comme
 *Your Request:*
 <run_experiment>
 [
-  {{"spring_constant": ..., "mass": ..., "damping_coefficient": ..., "initial_amplitude": ...}},
-  {{"spring_constant": ..., "mass": ..., "damping_coefficient": ..., "initial_amplitude": ...}}
+  {{"k_constant": ..., "mass": ..., "b_constant": ..., "initial_amplitude": ...}},
+  {{"k_constant": ..., "mass": ..., "b_constant": ..., "initial_amplitude": ...}}
 ]
 </run_experiment>
 

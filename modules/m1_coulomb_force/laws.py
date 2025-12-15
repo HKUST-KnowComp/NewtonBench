@@ -3,63 +3,62 @@ import random
 from typing import Dict, List, Tuple, Callable, Optional
 
 # --- Environment Constants ---
-# K_COULOMB = 5.9892553e9  # N m^2 / C^2
-K_COULOMB = 2.0
+CONSTANT = 2.0
 
 # --- Ground Truth Physics Engine ---
 def _ground_truth_law_easy_v0(q1: float, q2: float, distance: float) -> float:
-    """Easy law: F = K_COULOMB * q1 * q2 / r^3"""
+    """Easy law: F = K * q1 * q2 / r^3"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * q1 * q2) / (distance ** 3)
+    return (CONSTANT * q1 * q2) / (distance ** 3)
 
 def _ground_truth_law_easy_v1(q1: float, q2: float, distance: float) -> float:
-    """Easy law: F = K_COULOMB * (q1 * q2)^3 / r^2"""
+    """Easy law: F = K * (q1 * q2)^3 / r^2"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * (q1 * q2) ** 3) / (distance ** 2)
+    return (CONSTANT * (q1 * q2) ** 3) / (distance ** 2)
 
 def _ground_truth_law_easy_v2(q1: float, q2: float, distance: float) -> float:
-    """Easy law: F = K_COULOMB * q1^3 * q2 / r^2"""
+    """Easy law: F = K * q1^3 * q2 / r^2"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * q1 ** 3 * q2) / (distance ** 2)
+    return (CONSTANT * q1 ** 3 * q2) / (distance ** 2)
 
 def _ground_truth_law_medium_v0(q1: float, q2: float, distance: float) -> float:
-    """Medium law: F = K_COULOMB * (q1 * q2) * (q1 + q2) / r^2"""
+    """Medium law: F = K * (q1 * q2) * (q1 + q2) / r^2"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * (q1 * q2) * (q1 + q2)) / (distance ** 2)
+    return (CONSTANT * (q1 * q2) * (q1 + q2)) / (distance ** 2)
 
 def _ground_truth_law_medium_v1(q1: float, q2: float, distance: float) -> float:
-    """Medium law: F = K_COULOMB * (q1 + q2)^3 / r^2"""
+    """Medium law: F = K * (q1 + q2)^3 / r^2"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * (q1 + q2) ** 3) / (distance ** 2)
+    return (CONSTANT * (q1 + q2) ** 3) / (distance ** 2)
 
 def _ground_truth_law_medium_v2(q1: float, q2: float, distance: float) -> float:
-    """Medium law: F = K_COULOMB * q1^3 * q2^2 / r^2.5"""
+    """Medium law: F = K * q1^3 * q2^2 / r^2.5"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * q1 ** 3 * q2 ** 2) / (distance ** 2.5)
+    return (CONSTANT * q1 ** 3 * q2 ** 2) / (distance ** 2.5)
 
 def _ground_truth_law_hard_v0(q1: float, q2: float, distance: float) -> float:
-    """Hard law: F = K_COULOMB * (q1 * q2) * (q1 + q2) / r^e"""
+    """Hard law: F = K * (q1 * q2) * (q1 + q2) / r^e"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return ((K_COULOMB * (q1 * q2) * (q1 + q2)) / (distance ** np.exp(1)))
+    return ((CONSTANT * (q1 * q2) * (q1 + q2)) / (distance ** np.exp(1)))
 
 def _ground_truth_law_hard_v1(q1: float, q2: float, distance: float) -> float:
-    """Hard law: F = K_COULOMB * q2^2 * (q1 + q2)^3 / r^2"""
+    """Hard law: F = K * q2^2 * (q1 + q2)^3 / r^2"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * q2 ** 2 * (q1 + q2) ** 3) / (distance ** 2)
+    return (CONSTANT * q2 ** 2 * (q1 + q2) ** 3) / (distance ** 2)
 
 def _ground_truth_law_hard_v2(q1: float, q2: float, distance: float) -> float:
-    """Hard law: F = K_COULOMB * q1^3 * q2^2 / r^e"""
+    """Hard law: F = K * q1^3 * q2^2 / r^e"""
     if distance <= 0 or q1 == 0 or q2 == 0:
         return 0.0
-    return (K_COULOMB * q1 ** 3 * q2 ** 2) / (distance ** np.exp(1))
+    return (CONSTANT * q1 ** 3 * q2 ** 2) / (distance ** np.exp(1))
 
 # --- Law Registry ---
 LAW_REGISTRY = {

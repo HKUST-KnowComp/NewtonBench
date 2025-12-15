@@ -9,9 +9,9 @@ HEAT_TRANSFER_CONSTANTS = {
     'TIME_SCALING_FACTOR': 100.0,           # Scaling factor for time calculation: t = (m * c) / 100
     'MIN_ENERGY_LOSS': 0.18,                # Minimum energy loss before distribution (18%)
     'MAX_ENERGY_LOSS': 0.22,                # Maximum energy loss before distribution (22%)
-    'LIGHT_BULB_POWER': 1.0,                # Power required per light bulb in Watts
-    'MIN_SPECIFIC_HEAT_FACTOR': 0.7,        # Minimum factor to multiply c by for alternative calculation
-    'MAX_SPECIFIC_HEAT_FACTOR': 1.2,        # Maximum factor to multiply c by for alternative calculation
+    'LIGHT_BULB_POWER': 1.0,                # Power required per light bulb
+    'MIN_FACTOR': 0.7,                      # Minimum factor to multiply c by for alternative calculation
+    'MAX_FACTOR': 1.2,                      # Maximum factor to multiply c by for alternative calculation
 }
 
 # Precision constants for evaluation

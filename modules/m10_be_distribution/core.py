@@ -69,7 +69,7 @@ def run_experiment_for_module(
 
     if system == ExperimentSystem.VANILLA_EQUATION:
         omega = kwargs.get('omega', 1e8)
-        T = kwargs.get('T', 1e3)
+        T = kwargs.get('temperature', 1e3)
         
         true_n = ground_truth_law(omega, T)
         return inject_noise(true_n, noise_level, ABSOLUTE_OCCUPATION_NUMBER_PRECISION)

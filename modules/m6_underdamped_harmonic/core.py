@@ -22,14 +22,14 @@ def validate_function_definition(code: str) -> Tuple[bool, str]:
     return True, None
 
 def _run_damped_oscillator_simple(
-    spring_constant: float,
+    k_constant: float,
     mass: float,
-    damping_coefficient: float,
+    b_constant: float,
     noise_level: float,
     ground_truth_law: Callable
 ) -> dict:
     """Calculates the period of a damped oscillator."""
-    omega = ground_truth_law(spring_constant, mass, damping_coefficient)
+    omega = ground_truth_law(k_constant, mass, b_constant)
     if not np.isfinite(omega) or omega == 0:
         return {'period': 'invalid'}
     
@@ -38,15 +38,15 @@ def _run_damped_oscillator_simple(
     return {'period': "{:.6e}".format(float(noisy_period))}
 
 def _run_damped_oscillator_difficult(
-    spring_constant: float,
+    k_constant: float,
     mass: float,
-    damping_coefficient: float,
+    b_constant: float,
     initial_amplitude: float,
     noise_level: float,
     ground_truth_law: Callable
 ) -> dict:
     """Calculates the amplitude of a damped oscillator over time."""
-    omega = ground_truth_law(spring_constant, mass, damping_coefficient)
+    omega = ground_truth_law(k_constant, mass, b_constant)
     if not np.isfinite(omega) or omega == 0:
         return {'time': [], 'amplitude': []}
 
@@ -74,18 +74,18 @@ def run_experiment_for_module(
     ground_truth_law, _ = get_ground_truth_law(difficulty, law_version)
 
     if system == ExperimentSystem.VANILLA_EQUATION:
-        k = kwargs.get('k', DAMPED_OSCILLATOR_DEFAULTS['spring_constant'])
-        m = kwargs.get('m', DAMPED_OSCILLATOR_DEFAULTS['mass'])
-        b = kwargs.get('b', DAMPED_OSCILLATOR_DEFAULTS['damping_coefficient'])
+        k = kwargs.get('k_constant', DAMPED_OSCILLATOR_DEFAULTS['k_constant'])
+        m = kwargs.get('mass', DAMPED_OSCILLATOR_DEFAULTS['mass'])
+        b = kwargs.get('b_constant', DAMPED_OSCILLATOR_DEFAULTS['b_constant'])
         true_omega = ground_truth_law(k, m, b)
         return inject_noise(true_omega, noise_level, ABSOLUTE_ANGULAR_VELOCITY_PRECISION)
 
     elif system == ExperimentSystem.SIMPLE_SYSTEM:
         params = {**DAMPED_OSCILLATOR_DEFAULTS, **kwargs}
         return _run_damped_oscillator_simple(
-            spring_constant=params['spring_constant'],
+            k_constant=params['k_constant'],
             mass=params['mass'],
-            damping_coefficient=params['damping_coefficient'],
+            b_constant=params['b_constant'],
             noise_level=noise_level,
             ground_truth_law=ground_truth_law
         )
@@ -93,9 +93,9 @@ def run_experiment_for_module(
     elif system == ExperimentSystem.COMPLEX_SYSTEM:
         params = {**DAMPED_OSCILLATOR_DEFAULTS, **kwargs}
         return _run_damped_oscillator_difficult(
-            spring_constant=params['spring_constant'],
+            k_constant=params['k_constant'],
             mass=params['mass'],
-            damping_coefficient=params['damping_coefficient'],
+            b_constant=params['b_constant'],
             initial_amplitude=params['initial_amplitude'],
             noise_level=noise_level,
             ground_truth_law=ground_truth_law

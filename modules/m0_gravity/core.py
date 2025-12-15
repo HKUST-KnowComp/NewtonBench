@@ -59,10 +59,8 @@ def _run_orbital_experiment(
     Returns:
         dict: Time series data with keys 'time', 'position', 'velocity', all as JSON-serializable lists (no NumPy arrays).
     """
-    # Initialize arrays for time series data
     num_steps = int(duration / time_step)
     
-    # Validate parameters to prevent empty arrays
     if num_steps <= 0:
         return {
             'time': [],
@@ -74,23 +72,17 @@ def _run_orbital_experiment(
     positions = np.zeros((num_steps, 2))
     velocities = np.zeros((num_steps, 2))
     
-    # Set initial conditions
-    # mass1 at origin, mass2 at (distance, 0)
     positions[0] = np.array([distance, 0.0])
-    # Initial velocity perpendicular to radius (for circular orbit)
     velocities[0] = np.array([0.0, initial_velocity])
     
-    # Time evolution using Verlet integration
     for i in range(1, num_steps):
-        # Calculate acceleration
         acc = calculate_acceleration_2d(
             mass1, mass2,
-            np.array([0.0, 0.0]),  # mass1 at origin
+            np.array([0.0, 0.0]), 
             positions[i-1],
             force_law
-        )[1]  # We only need acc of mass2
+        )[1]  
         
-        # Update position and velocity
         pos_new, vel_half = verlet_integration_2d(
             positions[i-1],
             velocities[i-1],
@@ -98,7 +90,6 @@ def _run_orbital_experiment(
             time_step
         )
         
-        # Calculate new acceleration for velocity update
         acc_new = calculate_acceleration_2d(
             mass1, mass2,
             np.array([0.0, 0.0]),
@@ -106,18 +97,14 @@ def _run_orbital_experiment(
             force_law
         )[1]
         
-        # Final velocity update
         vel_new = vel_half + 0.5 * acc_new * time_step
         
-        # Store results
         positions[i] = pos_new
         velocities[i] = vel_new
     
-    # Add noise to measurements
     noisy_positions = inject_noise(positions, noise_level, ABSOLUTE_POSITION_PRECISION)
     noisy_velocities = inject_noise(velocities, noise_level, ABSOLUTE_VELOCITY_PRECISION)
 
-    # Downsample to at most 20 data points
     max_points = 20
     if len(times) > max_points:
         times = times[:max_points]
@@ -157,10 +144,8 @@ def _run_linear_experiment(
     Returns:
         dict: Time series data with keys 'time', 'position', 'velocity', all as JSON-serializable lists (no NumPy arrays).
     """
-    # Initialize arrays for time series data
     num_steps = int(duration / time_step)
     
-    # Validate parameters to prevent empty arrays
     if num_steps <= 0:
         return {
             'time': [],
@@ -173,21 +158,17 @@ def _run_linear_experiment(
     velocities = np.zeros(num_steps)
     accelerations = np.zeros(num_steps)
     
-    # Set initial conditions
     positions[0] = distance
     velocities[0] = initial_velocity
     
-    # Initial acceleration
     acc0 = calculate_acceleration_1d(
         mass1, mass2,
         positions[0],
         force_law
-    )[1]  # We only need acc of mass2
+    )[1]  
     accelerations[0] = acc0
     
-    # Time evolution using Verlet integration
     for i in range(1, num_steps):
-        # Update position and velocity
         pos_new, vel_half = verlet_integration_1d(
             positions[i-1],
             velocities[i-1],
@@ -195,26 +176,21 @@ def _run_linear_experiment(
             time_step
         )
         
-        # Calculate new acceleration for velocity update
         acc_new = calculate_acceleration_1d(
             mass1, mass2,
             pos_new,
             force_law
         )[1]
         
-        # Final velocity update
         vel_new = vel_half + 0.5 * acc_new * time_step
         
-        # Store results
         positions[i] = pos_new
         velocities[i] = vel_new
         accelerations[i] = acc_new
     
-    # Add noise to measurements
     noisy_positions = inject_noise(positions, noise_level, ABSOLUTE_POSITION_PRECISION)
     noisy_velocities = inject_noise(velocities, noise_level, ABSOLUTE_VELOCITY_PRECISION)
 
-    # Downsample to at most 20 data points
     max_points = 20
     if len(times) > max_points:
         times = times[:max_points]

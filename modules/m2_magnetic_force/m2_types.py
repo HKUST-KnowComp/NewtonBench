@@ -11,7 +11,7 @@ LINEAR_DEFAULTS = {
 
 # Default parameters for fixed wire experiments (complex system)
 FIXED_WIRE_DEFAULTS = {
-    'current1': 1.0,  # AC amplitude for wire 1 (50Hz)
+    'current1': 1.0,  # AC amplitude for wire 1
     'current2': 1.0,  # DC current for wire 2
     'mass_wire': 0.01,  # Mass of the moving wire
     'distance': 0.1,  # Initial distance between wires

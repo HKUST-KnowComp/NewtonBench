@@ -22,20 +22,16 @@ def calculate_acceleration_2d(
     Returns:
         Tuple of acceleration vectors (acc1, acc2)
     """
-    # Calculate displacement vector
     r = pos2 - pos1
     distance = np.linalg.norm(r)
 
     if distance == 0:
         return np.zeros(2), np.zeros(2)
     
-    # Unit vector pointing from pos1 to pos2
     r_hat = r / distance
     
-    # Calculate force magnitude
     force = force_law(mass1, mass2, distance)
     
-    # Calculate accelerations (Newton's second law)
     acc1 = (force / mass1) * r_hat
     acc2 = -(force / mass2) * r_hat
     
@@ -59,15 +55,11 @@ def calculate_acceleration_1d(
     Returns:
         Tuple of accelerations (acc1, acc2)
     """
-    # Calculate force magnitude
     force = force_law(mass1, mass2, abs(distance))
     
-    # Force direction depends on sign of distance
     force *= np.sign(distance)
     
-    # Fixed mass has no acceleration
     acc1 = 0.0
-    # Moving mass accelerates according to F = ma
     acc2 = -force / mass2
     
     return acc1, acc2

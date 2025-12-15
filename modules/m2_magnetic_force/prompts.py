@@ -17,8 +17,8 @@ RETURN_DESCRIPTION = "the magnitude of the magnetic force per unit length exerte
 EXAMPLE = """**Example 1:**
 <final_law>
 def discovered_law(current1, current2, distance):
-   K = 2.0e-7
-   return (K * current1 * current2) / (distance)
+   C = 2.0e-7
+   return (C * current1 * current2) / (distance)
 </final_law>
 
 **Note**:
@@ -27,9 +27,9 @@ def discovered_law(current1, current2, distance):
 
 VANILLA_EQUATION_PROMPT = """**Experimental Apparatus:**
 You have access to a device that can set up two long, parallel wires and measure the magnetic force per unit length exerted on wire 2 by wire 1. You have precise control over:
-- `current1`: Electric current in the first wire (in Amperes).
-- `current2`: Electric current in the second wire (in Amperes).
-- `distance`: The perpendicular distance between the wires (in meters). (always positive)
+- `current1`: Electric current in the first wire.
+- `current2`: Electric current in the second wire.
+- `distance`: The perpendicular distance between the wires. (always positive)
 
 {RUN_EXPERIMENT_INSTRUCTION}
 
@@ -59,14 +59,13 @@ You have access to a 1D motion tracking system that can:
 4. Track the position and velocity of Wire 2 over time.
 
 **Control Parameters:**
-- `current1`: Current in the fixed wire (Wire 1) in Amperes. (positive means z-direction, negative means -z direction)
-- `current2`: Current in the moving wire (Wire 2) in Amperes. (positive means z-direction, negative means -z direction)
-- `mass_wire`: The mass per unit length of the moving wire (in kg/m).
-- `distance`: The initial starting position of Wire 2 on the x-axis (in meters). (always positive)
-- `initial_velocity`: The initial velocity of Wire 2 (in m/s).
-- `duration`: The time to track the motion (in seconds).
-- `time_step`: The time interval between measurements (in seconds).
-
+- `current1`: Current in the fixed wire (Wire 1). (positive means z-direction, negative means -z direction)
+- `current2`: Current in the moving wire (Wire 2). (positive means z-direction, negative means -z direction)
+- `mass_wire`: The mass per unit length of the moving wire.
+- `distance`: The initial starting position of Wire 2 on the x-axis. (always positive)
+- `initial_velocity`: The initial velocity of Wire 2.
+- `duration`: The time to track the motion.
+- `time_step`: The time interval between measurements.
 **Note:**
 - The sign for the current is used to provide a simple way to control the direction of the current. You can assume that the current1 and current2 for the discovered law are the magnitudes of the currents, which will always be positive.
 
@@ -123,12 +122,11 @@ You have access to a device that can set up two long, parallel wires and track t
 6. **Data Output**: Exactly 20 data points of position and velocity over time
 
 **Controllable Parameters:**
-- `current1`: AC amplitude for wire 1 (in Amperes) - controls the strength of the alternating magnetic field
-- `current2`: DC current for wire 2 (in Amperes) - controls the constant current in the moving wire
-- `mass_wire`: Mass of the moving wire (in kg/m)
-- `distance`: Initial distance between the wires (in meters) (always positive)
-- `initial_velocity`: Initial velocity of the moving wire (in m/s)
-
+- `current1`: AC amplitude for wire 1 - controls the strength of the alternating magnetic field
+- `current2`: DC current for wire 2 - controls the constant current in the moving wire
+- `mass_wire`: Mass of the moving wire
+- `distance`: Initial distance between the wires (always positive)
+- `initial_velocity`: Initial velocity of the moving wire
 **Note:**
 - The sign for current1 controls the AC phase (positive = sine wave, negative = inverted sine wave)
 - The sign for current2 controls the DC direction (positive means z-direction, negative means -z direction)
@@ -224,9 +222,8 @@ print("Estimated error:", error)
 ```
 <python>
 def test_hypothesis(current1, current2, distance):
-	# Test your hypothesis: F = (K * I1 * I2) / r^3
-	K = 4.78e-2
-	return (K * current1 * current2) / (distance ** 3)
+	C = 4.78e-2
+	return (C * current1 * current2) / (distance ** 3)
 
 # Test with different parameters
 test_I1 = [1.0, 2.0, 3.0]
@@ -252,9 +249,8 @@ I1=3.0, I2=1.0, d=3.0 → F=0.0018
 **Your Code:**
 ```python
 def test_hypothesis(current1, current2, distance):
-	# Test your hypothesis: F = (K * I1 * I2) / r^3
-	K = 4.78e-2
-	return (K * current1 * current2) / (distance ** 3)
+	C = 4.78e-2
+	return (C * current1 * current2) / (distance ** 3)
 
 # Test with different parameters
 test_I1 = [1.0, 2.0, 3.0]

@@ -2,12 +2,12 @@ from modules.common.types import ExperimentSystem, ABSOLUTE_POSITION_PRECISION, 
 
 # Default parameters for orbital motion
 TWO_DIM_DEFAULTS = {
-    'time_step': 0.1,      # seconds
-    'duration': 10.0,      # seconds
+    'time_step': 0.1, 
+    'duration': 10.0, 
 }
 
 # Default parameters for linear motion
 LINEAR_DEFAULTS = {
-    'time_step': 0.01,     # seconds
-    'duration': 5.0,      # seconds
+    'time_step': 0.01,
+    'duration': 5.0, 
 } 

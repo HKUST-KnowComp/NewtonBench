@@ -7,8 +7,8 @@ ABSOLUTE_AMPLITUDE_PRECISION = 1e-9
 
 # Default parameters for the damped oscillator experiment
 DAMPED_OSCILLATOR_DEFAULTS = {
-    'spring_constant': 10.0,
+    'k_constant': 10.0,
     'mass': 1.0,
-    'damping_coefficient': 0.5,
+    'b_constant': 0.5,
     'initial_amplitude': 1.0,
 }

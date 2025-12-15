@@ -2,62 +2,102 @@ import numpy as np
 import random
 from typing import Dict, List, Tuple, Callable, Optional
 
+CONSTANT = 231.141
+CONSTANT2 = 1241.9012
+CONSTANT3 = 12.578
+
 # --- Easy Difficulty Laws ---
-def _ground_truth_law_easy_v0(k: float, x: float) -> float:
+def _ground_truth_law_easy_v0(x: float) -> float:
     """Easy Hooke's law: U = 2kx^2"""
-    k, x = float(k), float(x)  # Ensure float conversion
-    return 2 * k * (x ** 2)
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * (x ** 2)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
-def _ground_truth_law_easy_v1(k: float, x: float) -> float:
-    """Easy Hooke's law: U = 2k^2x"""
-    k, x = float(k), float(x)  # Ensure float conversion
-    return 2 * k ** 2 * x
+def _ground_truth_law_easy_v1(x: float) -> float:
+    """Easy Hooke's law: U = 2kx^0.5"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * x ** 0.5
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
-def _ground_truth_law_easy_v2(k: float, x: float) -> float:
-    """Easy Hooke's law: U = 2k^3x^2"""
-    k, x = float(k), float(x)  # Ensure float conversion
-    return 2 * k ** 3 * x ** 2
+def _ground_truth_law_easy_v2(x: float) -> float:
+    """Easy Hooke's law: U = 2kx^3.4"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * x ** 3.4
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 # --- Medium Difficulty Laws ---
-def _ground_truth_law_medium_v0(k: float, x: float) -> float:
-    """Medium Hooke's law: U = 2(k + x^2)"""
-    k, x = float(k), float(x)  # Ensure float conversion
-    return 2 * (k + (x ** 2))
+def _ground_truth_law_medium_v0(x: float) -> float:
+    """Medium Hooke's law: U = 2k x^2 + K2*x"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * (x ** 2) + CONSTANT2 * x
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
-def _ground_truth_law_medium_v1(k: float, x: float) -> float:
-    """Medium Hooke's law: U = 2(k^2 + x^3)"""
-    k, x = float(k), float(x)  # Ensure float conversion
-    return 2 * (k ** 2 + x ** 3)
+def _ground_truth_law_medium_v1(x: float) -> float:
+    """Medium Hooke's law: U = 2k x^0.5 + K2*x^3"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * x ** 0.5 + CONSTANT2 * x ** 3
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
-def _ground_truth_law_medium_v2(k: float, x: float) -> float:
-    """Medium Hooke's law: U = 2(k^3 + x^2)"""
-    k, x = float(k), float(x)  # Ensure float conversion
-    return 2 * (k ** 3 + (x ** 2))
+def _ground_truth_law_medium_v2(x: float) -> float:
+    """Medium Hooke's law: U = 2k x^3.4 + K2*x^0.5"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * x ** 3.4 + CONSTANT2 * x ** 0.5
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 # --- Hard Difficulty Laws ---
-def _ground_truth_law_hard_v0(k: float, x: float) -> float:
-    """Hard Hooke's law: U = 2(k + sin(x^2)), but clamped to 0 if negative"""
-    k, x = float(k), float(x)  # Ensure float conversion for NumPy operations
-    result = 2 * (k + np.sin(x ** 2))
-    if result <= 0:
-        return 0
-    return 2 * (k + np.sin(x ** 2))
+def _ground_truth_law_hard_v0(x: float) -> float:
+    """Hard Hooke's law: U = 2k x^2 + K2*x + K3/sqrt(x)"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * (x ** 2) + CONSTANT2 * x + CONSTANT3 / (np.sqrt(x))
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
-def _ground_truth_law_hard_v1(k: float, x: float) -> float:
-    """Hard Hooke's law: U = 2(sin(k^2) + x^3), but clamped to 0 if negative"""
-    k, x = float(k), float(x)  # Ensure float conversion for NumPy operations
-    result = 2 * (np.sin(k ** 2) + x ** 3)
-    if result <= 0:
-        return 0
-    return 2 * (np.sin(k ** 2) + x ** 3)
+def _ground_truth_law_hard_v1(x: float) -> float:
+    """Hard Hooke's law: U = 2k x^0.5 + K2*x^3 + K3/x^0.3"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * x ** 0.5 + CONSTANT2 * x ** 3 + CONSTANT3 / (x ** 0.3)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
-def _ground_truth_law_hard_v2(k: float, x: float) -> float:
-    """Hard Hooke's law: U = 2(sin(k^3) + x^2), but clamped to 0 if negative"""
-    k, x = float(k), float(x)  # Ensure float conversion for NumPy operations
-    result = 2 * (np.sin(k ** 3) + (x ** 2))
-    if result <= 0: 
-        return 0
-    return 2 * (np.sin(k ** 3) + (x ** 2))
+def _ground_truth_law_hard_v2(x: float) -> float:
+    """Hard Hooke's law: U = 2k x^3.4 + K2*x^0.5 + K3/x^(10/3)"""
+    try:
+        if x < 0:
+            return float('nan')
+        k, x = float(CONSTANT), float(x)  # Ensure float conversion
+        return 2 * k * x ** 3.4 + CONSTANT2 * x ** 0.5 + CONSTANT3 / x ** (10/3)
+    except (ValueError, ZeroDivisionError):
+        return float('nan')
 
 # --- Law Registry ---
 LAW_REGISTRY = {
