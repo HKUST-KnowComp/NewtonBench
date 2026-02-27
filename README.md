@@ -49,6 +49,8 @@ NewtonBench reveals that while LLMs are beginning to develop scientific reasonin
 
 
 ## 🔥 News
+* **26 Feb, 2026**: NewtonBench is integrated in [NVIDIA NeMo Gym](https://github.com/NVIDIA-NeMo/Gym) as an RL Environment!
+* **26 Jan, 2026**: NewtonBench is accepted by ICLR 2026!
 * **09 Oct, 2025**: The paper is released on [arXiv](https://arxiv.org/abs/2510.07172)!
 
 ## 📋 Table of Contents
